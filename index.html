@@ -3,12 +3,12 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Guide de voyage — Vacances au Japon</title>
+<title>Guide de voyage : Vacances au Japon</title>
 <meta name="description" content="Guide de préparation pour le voyage au Japon">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⛩️</text></svg>">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;700&family=Zen+Maru+Gothic:wght@400;500;700&display=swap">
-<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="style.css?v=19">
 </head>
 <body>
 
@@ -16,12 +16,12 @@
 
 <nav class="dot-nav" id="dotNav" aria-label="Navigation du guide">
   <a href="#hero" class="dot active" data-label="Accueil"><span></span></a>
-  <a href="#avant-de-partir" class="dot" data-label="Avant de partir"><span></span></a>
+  <a href="#introduction" class="dot" data-label="Quand et où"><span></span></a>
+  <a href="#culture" class="dot" data-label="Culture"><span></span></a>
+  <a href="#climat" class="dot" data-label="Climat"><span></span></a>
   <a href="#administratif" class="dot" data-label="Administratif"><span></span></a>
   <a href="#transports" class="dot" data-label="Transports"><span></span></a>
   <a href="#infos-utiles" class="dot" data-label="Infos utiles"><span></span></a>
-  <a href="#climat" class="dot" data-label="Climat"><span></span></a>
-  <a href="#culture" class="dot" data-label="Culture"><span></span></a>
 </nav>
 
 <main>
@@ -32,75 +32,276 @@
     <div class="hero-content reveal">
       <p class="kicker">プラゼザンキ家の日本旅行</p>
       <h1>Un guide pour de<br><span class="accent">supers vacances</span><br>au Japon</h1>
-      <p class="hero-sub">Bienvenue dans ce petit e-book de préparation à votre voyage — tout ce qu'il faut savoir avant de venir nous voir à Yonezawa !</p>
-      <a href="#avant-de-partir" class="scroll-cue">
+      <p class="hero-sub">Bienvenue dans ce guide de préparation pour votre voyage au Japon !</p>
+      <a href="#introduction" class="scroll-cue">
         <span>Commencer la lecture</span>
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M12 4v16m0 0l-6-6m6 6l6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
       </a>
     </div>
-    <div class="hero-image image-placeholder reveal" data-slot="images/inspiration4.png">
+    <div class="hero-image image-placeholder reveal" data-slot="images/hero.png">
       <span class="ph-icon">🗻</span>
       <span class="ph-label">Photo d'ouverture<br><small>images/hero.jpg</small></span>
     </div>
-    <img class="hero-sticker reveal" src="images/calendar.png" alt="Calendrier de septembre">
   </section>
 
-  <!-- AVANT DE PARTIR -->
-  <section id="avant-de-partir" class="section">
+  <!-- INTRODUCTION -->
+  <section id="introduction" class="section">
+    <div class="section-head reveal">
+      <span class="section-num">00</span>
+      <h2>Quand et où</h2>
+    </div>
+
+    <div class="card-grid">
+      <div class="card calendar-card reveal">
+        <div class="calendar-widget">
+          <p class="calendar-header">Septembre 2026</p>
+          <div class="calendar-weekdays">
+            <span>Lun</span><span>Mar</span><span>Mer</span><span>Jeu</span><span>Ven</span><span>Sam</span><span>Dim</span>
+          </div>
+          <div class="calendar-days">
+            <span class="cal-day muted">31</span>
+            <span class="cal-day">1</span>
+            <span class="cal-day">2</span>
+            <span class="cal-day highlight">3</span>
+            <span class="cal-day highlight">4</span>
+            <span class="cal-day highlight">5</span>
+            <span class="cal-day highlight">6</span>
+            <span class="cal-day highlight">7</span>
+            <span class="cal-day highlight">8</span>
+            <span class="cal-day highlight">9</span>
+            <span class="cal-day highlight">10</span>
+            <span class="cal-day highlight">11</span>
+            <span class="cal-day highlight">12</span>
+            <span class="cal-day highlight">13</span>
+            <span class="cal-day highlight">14</span>
+            <span class="cal-day highlight">15</span>
+            <span class="cal-day highlight">16</span>
+            <span class="cal-day highlight">17</span>
+            <span class="cal-day highlight">18</span>
+            <span class="cal-day highlight">19</span>
+            <span class="cal-day highlight">20</span>
+            <span class="cal-day highlight">21</span>
+            <span class="cal-day highlight">22</span>
+            <span class="cal-day highlight">23</span>
+            <span class="cal-day">24</span>
+            <span class="cal-day">25</span>
+            <span class="cal-day">26</span>
+            <span class="cal-day">27</span>
+            <span class="cal-day">28</span>
+            <span class="cal-day">29</span>
+            <span class="cal-day">30</span>
+            <span class="cal-day muted">1</span>
+            <span class="cal-day muted">2</span>
+            <span class="cal-day muted">3</span>
+            <span class="cal-day muted">4</span>
+          </div>
+          <p class="calendar-countdown" id="countdown"></p>
+        </div>
+      </div>
+
+      <div class="card reveal">
+        <h3>🏠 Notre maison</h3>
+        <p>Yonezawa se trouve dans la préfecture de Yamagata, à quelques heures de Shinkansen au nord de Tokyo.</p>
+        <div class="image-placeholder map-image reveal" data-slot="images/japan-map.png">
+          <span class="ph-icon">🗾</span>
+          <span class="ph-label">Carte Yonezawa / Tokyo / Fuji<br><small>images/japan-map.png</small></span>
+        </div>
+        <p class="note">✈️ Dans l'avion direction le Japon, le Mont Fuji sera du côté gauche, si jamais vous avez un siège de ce côté !</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- CULTURE -->
+  <section id="culture" class="section alt">
     <div class="section-head reveal">
       <span class="section-num">01</span>
-      <h2>Avant de partir</h2>
-      <p class="section-intro">Quelques préparatifs et petits plaisirs pour se mettre dans l'ambiance avant le grand départ.</p>
+      <h2>Culture</h2>
+      <p class="section-intro">Quelques explications sur les codes de la culture japonaise pour se mettre dans l'ambiance avant de venir et en profiter sereinement sur place.</p>
+    </div>
+
+    <div class="image-placeholder banner culture-banner reveal" data-slot="images/culture.jpg">
+      <span class="ph-icon">⛩️</span>
+      <span class="ph-label">Photo torii / rue japonaise<br><small>images/culture.jpg</small></span>
     </div>
 
     <div class="card-grid">
       <div class="card wide reveal">
-        <h3>☀️ Météo prévue</h3>
-        <div class="image-placeholder inline" data-slot="images/tokyo-weather.png">
-          <span class="ph-icon">📊</span>
-          <span class="ph-label">Visuel météo<br><small>images/meteo.jpg</small></span>
+        <h3>Quelques codes de politesse</h3>
+        <div class="reco-list">
+          <div class="reco">
+            <p class="reco-title">🤫 Ne pas déranger l'autre</p>
+            <p>La culture japonaise repose sur ce principe. On ressent un accent fort sur le respect et le silence. C'est très visible dans le métro mais aussi partout où on partage un espace fermé (ascenseurs, cafés...).</p>
+          </div>
+          <div class="reco">
+            <p class="reco-title">🚬 Cigarette</p>
+            <p>Fumer est interdit dans beaucoup d'endroits publics au Japon du fait de l'inconfort que cela peut provoquer aux personnes autour. De fait, il existe plein de petits endroits dédiés aux fumeurs ! Les ruelles un peu excentrées et moins passantes sont aussi souvent un lieu où il est toléré de fumer.</p>
+          </div>
+          <div class="reco">
+            <p class="reco-title">🍡 Manger dans la rue</p>
+            <p>Ne pas consommer les produits avant de les avoir payés, et manger les produits que vous venez d'acheter plutôt devant le magasin qu'en marchant dans la rue. Ce n'est pas formellement interdit de manger en marchant, mais il est plutôt recommandé de rester devant le magasin où vous venez d'acheter vos produits pour que vous soyez en mesure de jeter vos déchets dans une poubelle et éviter le risque d'en renverser dans la rue.</p>
+          </div>
+          <div class="reco">
+            <p class="reco-title">🗑️ Poubelles et déchets</p>
+            <p>Vous remarquerez que c'est un pays très propre dans lequel il est difficile de trouver une poubelle ! On garde ses déchets avec soi pour les jeter à la maison.</p>
+          </div>
+          <div class="reco">
+            <p class="reco-title">🚃 Dans les transports en commun</p>
+            <p>Éviter de parler fort ou d'être au téléphone dans les transports en commun. Aussi, il est préférable d'y mettre son sac à dos devant soi, pour ne pas gêner les autres utilisateurs et prendre moins de place.</p>
+          </div>
+          <div class="reco">
+            <p class="reco-title">💴 Pourboires</p>
+            <p>Pas besoin de pourboire, du tout ! C'est plutôt considéré comme irrespectueux ici ; il est beaucoup plus apprécié de remercier beaucoup.</p>
+          </div>
+          <div class="reco">
+            <p class="reco-title">🥢 Repas</p>
+            <p>Vous pouvez d'ores et déjà commencer à vous entraîner à manger avec des baguettes ! Il n'y a pas souvent d'autres couverts dans les restaurants (mais rien ne vous empêche de glisser une fourchette dans votre sac à main en voyage). On évite de se passer de la nourriture entre baguettes (futari-bashi), une manière de faire qui rappelle ici les cérémonies funéraires ; on évite également de planter ses baguettes dans le riz, ou de mettre de la sauce soja sur le riz (sur les accompagnements à la place). Le riz est vraiment sacré ici, on essaie de finir chaque grain de son bol pour respecter les agriculteurs !</p>
+          </div>
+          <div class="reco">
+            <p class="reco-title">♨️ Onsens</p>
+            <p>C'est une expérience très chouette à vivre sur place, mais il est quand même sympa de savoir ce qu'il faut faire et ne pas faire avant de se retrouver tout nu avec tout le monde !</p>
+            <p>Ce sont des bains chauds, très souvent séparés hommes/femmes. Les vestiaires sont séparés dès le hall d'entrée.</p>
+            <p>Dans le hall d'entrée, on paye son entrée et on loue 2 serviettes en général : 1 grande serviette de bain et 1 toute petite carrée. Ensuite, on se dirige vers son vestiaire homme ou femme.</p>
+            <p>On y retrouve des casiers pour déposer toutes ses affaires : c'est là qu'on se déshabille ! On prend avec soi sa petite serviette carrée.</p>
+            <p>On entre ensuite en général dans la grande pièce principale, où il y a des douches assises et les bains chauds. On prend un siège et un seau, et on va s'asseoir pour se doucher, avec savon, avant d'entrer dans les bains. On peut aussi se laver les cheveux. Avec le seau, on rince son siège et sa place quand on a fini. (Moi je trouve ça trop bien de se doucher assis).</p>
+            <p>Direction les bains ! Il faut éviter que vos cheveux touchent l'eau du bain (on attache ses cheveux longs) ainsi que votre petite serviette. Cette serviette peut être mouillée d'eau froide et posée sur la tête pour vous rafraîchir.</p>
+            <p>Quand vous avez fini, cette petite serviette vous sert à essuyer le surplus d'eau sur vous avant de vous rendre dans les vestiaires pour éviter d'en mettre partout. Vous pouvez ensuite retourner à votre casier et récupérer vos affaires.</p>
+            <p>Vous voilà tout relaxé !</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="card wide reveal">
+        <h3>🎬 Recommandations culturelles</h3>
+        <div class="reco-list media">
+          <div class="reco with-media">
+            <div class="image-placeholder reco-image portrait reveal" data-slot="images/tokyo-book.png">
+              <span class="ph-icon">📕</span>
+              <span class="ph-label">Couverture<br><small>images/tokyo-book.jpg</small></span>
+            </div>
+            <div class="reco-text">
+              <p class="reco-title">📕 Tokyo, Emily Itami (2025)</p>
+              <p>Anna et Tsubasa se sont connus enfants à Tokyo. Ils se croisent par hasard 20 ans plus tard et commencent à s'écrire. Anna est devenue londonienne, et Tsubasa lui raconte la culture qui aurait pu être la sienne si elle était restée, cette ville à l'organisation d'autant plus minutieuse qu'elle menace à chaque instant de s'enfoncer dans le chaos, où s'offrir des cadeaux est un art, s'endormir en réunion un signe de motivation, et où il ne faut jamais mettre de sauce soja sur le riz. Peut-on vraiment comprendre un Japonais ? Cette fiction est le guide ultime de Tokyo.</p>
+            </div>
+          </div>
+          <div class="reco with-media">
+            <div class="image-placeholder reco-image landscape reveal" data-slot="images/chihiro.png">
+              <span class="ph-icon">🎬</span>
+              <span class="ph-label">Affiche<br><small>images/chihiro.jpg</small></span>
+            </div>
+            <div class="reco-text">
+              <p class="reco-title">🎬 Le Voyage de Chihiro (千と千尋の神隠し), Hayao Miyazaki (2001)</p>
+              <p>Ce film vous transportera dans le monde des esprits, dans la campagne japonaise, inspirée d'un village à quelques dizaines de kilomètres de Yonezawa. En suivant l'histoire de Chihiro, une fillette de dix ans qui veut sauver ses parents du mauvais sort de la sorcière, vous découvrirez les onsens, ces bains publics japonais, ici réservés aux esprits fatigués, les nuages cotonneux, la nature verdoyante et le lien mystique aux animaux, que l'on retrouve beaucoup au Japon.</p>
+            </div>
+          </div>
+          <div class="reco with-media">
+            <div class="image-placeholder reco-image landscape reveal" data-slot="images/birth-of-sake.png">
+              <span class="ph-icon">🔍</span>
+              <span class="ph-label">Affiche<br><small>images/birth-of-sake.jpg</small></span>
+            </div>
+            <div class="reco-text">
+              <p class="reco-title">🔍 The Birth of Sake, Erik Shirai (2015)</p>
+              <p>Ce documentaire (gratuit sur Youtube <a href="https://www.youtube.com/watch?v=ilnasx8KoaQ" target="_blank" rel="noopener">ici</a>) suit la famille et les employés de la distillerie Tedorigawa, dans le processus traditionnel lent et difficile de la confection du saké qui dure tout l'hiver. Une immersion dans la culture japonaise incomparable.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card wide reveal">
+        <h3>🈁 Apprendre un peu de japonais ?</h3>
+        <p><strong>Quelques bases utiles, avec leur prononciation :</strong></p>
+        <table class="phrase-table">
+          <thead><tr><th>Français</th><th>Japonais</th><th>Prononciation</th></tr></thead>
+          <tbody>
+            <tr><td>Bonjour</td><td>こんにちは</td><td>Konnichiwa <em>(konn-i-tchi-oua)</em></td></tr>
+            <tr><td>Merci beaucoup</td><td>ありがとうございます</td><td>Arigatou gozaimasu <em>(ari-ga-toh go-za-i-mass)</em></td></tr>
+            <tr><td>Pardon / excusez-moi</td><td>すみません</td><td>Sumimasen <em>(sou-mi-ma-sènn)</em></td></tr>
+            <tr><td>Oui / Non</td><td>はい / いいえ</td><td>Hai / Iie <em>(haï / ii-é)</em></td></tr>
+            <tr><td>Ça va</td><td>大丈夫です</td><td>Daijobu desu <em>(daï-jo-bou dess)</em></td></tr>
+            <tr><td>S'il vous plaît</td><td>お願いします</td><td>Onegaishimasu <em>(o-né-gaï-chi-mass)</em></td></tr>
+            <tr><td>Combien ça coûte ?</td><td>いくらですか？</td><td>Ikura desu ka? <em>(i-kou-ra dess ka)</em></td></tr>
+            <tr><td>Où sont les toilettes ?</td><td>トイレはどこですか？</td><td>Toire wa doko desu ka? <em>(toy-ré oua doko dess ka)</em></td></tr>
+            <tr><td>Santé !</td><td>乾杯！</td><td>Kanpaï! <em>(kan-paï)</em></td></tr>
+            <tr><td>Au revoir</td><td>さようなら</td><td>Sayounara <em>(sa-yo-na-ra)</em></td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="card wide reveal">
+        <h3>📸 Google Traduction et sa fonction <em>caméra</em></h3>
+        <p>Téléchargez Google Traduction et pensez à sa fonction caméra : elle traduit en temps réel les panneaux, les menus...</p>
+        <p>Entraînez-vous avec ce petit texte :</p>
+        <p class="practice-text">日本でまた会いましょう！</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- CLIMAT -->
+  <section id="climat" class="section">
+    <div class="section-head reveal">
+      <span class="section-num">02</span>
+      <h2>Le climat</h2>
+      <p class="section-intro">À quoi s'attendre côté météo et quoi emmener dans votre valise.</p>
+    </div>
+
+    <div class="card-grid">
+      <div class="card wide reveal">
+        <h3>🌡️ Tokyo en septembre</h3>
+        <div class="table-scroll">
+          <table class="weather-table">
+            <thead>
+              <tr>
+                <th>Ensoleillement (h/j)</th>
+                <th>T° moyenne min (°C)</th>
+                <th>T° moyenne max (°C)</th>
+                <th>T° record min (°C)</th>
+                <th>T° record max (°C)</th>
+                <th>Précipitations (mm)</th>
+                <th>Jours de pluie</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>5</td>
+                <td>20</td>
+                <td>27</td>
+                <td>11</td>
+                <td>35</td>
+                <td>233</td>
+                <td>12</td>
+              </tr>
+            </tbody>
+          </table>
         </div>
       </div>
 
       <div class="card reveal">
         <h3>👕 Vêtements importants</h3>
         <ul>
-          <li>Maillot de bain — pas de « parachute » pour les hommes (short classique), plutôt une pièce pour les femmes</li>
-          <li>Chaussures confortables pour marcher longtemps — pas besoin de chaussures de randonnée, mais privilégiez le confort</li>
+          <li>Chaussures confortables pour marcher</li>
+          <li>Maillot de bain (éviter maillots « parachute » pour les hommes, privilégier maillot 1 pièce pour les femmes)</li>
+          <li>Veste de pluie légère</li>
+          <li>Une petite laine !</li>
         </ul>
       </div>
 
       <div class="card reveal">
-        <h3>🎬 Films et livres avant de venir</h3>
+        <h3>🧳 Quelques indispensables dans la valise</h3>
         <ul>
-          <li>Le livre <em>Tokyo</em></li>
-          <li><em>Le Voyage de Chihiro</em></li>
-          <li><em>The Birth of Sake</em> — <a href="https://www.youtube.com/watch?v=ilnasx8KoaQ" target="_blank" rel="noopener">à regarder ici</a></li>
+          <li>Chargeur de portable avec adaptateur France-Japon (c'est le même qu'un adaptateur France-USA)</li>
+          <li>Déodorant (ils en ont très peu ici, il vaut mieux amener le vôtre)</li>
         </ul>
+        <p class="note">Venir léger, pour ramener plein de souvenirs !</p>
       </div>
 
-      <div class="card reveal">
-        <h3>📱 Applications utiles</h3>
-        <ul>
-          <li>Google Traduction — pensez à la fonction caméra (traduction en temps réel des panneaux et menus)</li>
-        </ul>
-      </div>
-
-      <div class="card reveal">
-        <h3>🈁 Apprendre un peu de japonais ?</h3>
-        <ul>
-          <li>Konbini <span class="jp">(コンビニ)</span> — supérette de quartier, à connaître avant d'arriver !</li>
-        </ul>
-      </div>
     </div>
   </section>
 
   <!-- ADMINISTRATIF -->
   <section id="administratif" class="section alt">
     <div class="section-head reveal">
-      <span class="section-num">02</span>
+      <span class="section-num">03</span>
       <h2>Administratif</h2>
-      <p class="section-intro">Les démarches à faire avant le départ, dans l'ordre où on y pense généralement.</p>
+      <p class="section-intro">Les démarches à faire avant le départ.</p>
     </div>
 
     <div class="card-grid">
@@ -116,8 +317,8 @@
       </div>
 
       <div class="card wide reveal">
-        <h3>📶 eSIM — Ubigi</h3>
-        <p>Pour avoir internet au Japon, j'utilise personnellement <a href="https://www.ubigi.com/" target="_blank" rel="noopener">Ubigi</a>. Si vous connaissez votre consommation actuelle en France, ça donne un bon indicateur — en gardant en tête qu'on utilise un peu plus son téléphone en voyage (traduction, GPS...).</p>
+        <h3>📶 eSIM Ubigi</h3>
+        <p>Pour avoir internet au Japon, j'utilise personnellement <a href="https://www.ubigi.com/" target="_blank" rel="noopener">Ubigi</a>. Si vous connaissez votre consommation actuelle en France, ça donne un bon indicateur, en gardant en tête qu'on utilise un peu plus son téléphone en voyage (traduction, GPS...).</p>
         <table class="price-table">
           <thead><tr><th>Forfait (30 jours)</th><th>Prix</th></tr></thead>
           <tbody>
@@ -128,8 +329,12 @@
             <tr><td>Illimité</td><td>65 €</td></tr>
           </tbody>
         </table>
-        <p class="note">⚠️ Une fois l'eSIM ajoutée à votre téléphone, vérifiez bien à l'arrivée que vous utilisez internet via ce forfait et non votre forfait français (<em>Réglages → Données cellulaires</em>) — sinon les dépassements en itinérance peuvent coûter très cher très vite. Un numéro de téléphone japonais n'est pas nécessaire, mais l'accès à internet est très pratique.</p>
-        <img src="images/mobile-settings-iphone.png" alt="Réglages iPhone montrant l'eSIM Ubigi active" class="screenshot">
+        <div class="note-with-media">
+          <p class="note">⚠️ Une fois l'eSIM ajoutée à votre téléphone, vérifiez bien à l'arrivée que vous utilisez internet via ce forfait et non votre forfait français (<em>Réglages → Données cellulaires</em>). Sinon, les dépassements en itinérance peuvent coûter très cher très vite. Un numéro de téléphone japonais n'est pas nécessaire, mais l'accès à internet est très pratique.</p>
+          <div class="image-placeholder screenshot reveal" data-slot="images/esim-screenshot.png">
+            <span class="ph-label">Capture réglages iPhone<br><small>images/esim-screenshot.jpg</small></span>
+          </div>
+        </div>
       </div>
     </div>
   </section>
@@ -137,12 +342,12 @@
   <!-- TRANSPORTS -->
   <section id="transports" class="section">
     <div class="section-head reveal">
-      <span class="section-num">03</span>
+      <span class="section-num">04</span>
       <h2>Les transports</h2>
       <p class="section-intro">Shinkansen, métro, voiture : comment se déplacer une fois sur place.</p>
     </div>
 
-    <div class="image-placeholder banner reveal" data-slot="images/inspiration2.png">
+    <div class="image-placeholder banner reveal" data-slot="images/transports.png">
       <span class="ph-icon">🚄</span>
       <span class="ph-label">Photo shinkansen / gare<br><small>images/transports.jpg</small></span>
     </div>
@@ -150,15 +355,15 @@
     <div class="card-grid">
       <div class="card wide reveal">
         <h3>🚄 Le Shinkansen</h3>
-        <p>Pour voyager en Shinkansen (l'équivalent du TGV) à travers le Japon, certaines lignes ont des sites de réservation en ligne, d'autres non — certains billets s'achètent donc directement en gare.</p>
+        <p>Pour voyager en Shinkansen (l'équivalent du TGV) à travers le Japon, certaines lignes ont des sites de réservation en ligne, d'autres non : certains billets s'achètent donc directement en gare.</p>
         <p>Vous pouvez voyager debout même si les places assises sont épuisées, tant que le train comprend des wagons sans réservation.</p>
         <p>Le prix des billets est toujours le même, que vous réserviez 3 semaines à l'avance ou 30 minutes avant le départ.</p>
       </div>
 
       <div class="card wide reveal">
-        <h3><img src="images/suica.png" alt="Suica" class="inline-icon"> Le métro & la carte Suica</h3>
+        <h3>🚇 Le métro & la carte Suica</h3>
         <p>À Tokyo notamment, le métro est l'une des meilleures façons de se déplacer dans la ville.</p>
-        <p><strong>Carte de métro dématérialisée — la Suica :</strong></p>
+        <p><strong>Carte de métro dématérialisée, la Suica :</strong></p>
         <ol>
           <li>Ouvrir l'application « Wallet » / « Cartes » sur iPhone</li>
           <li>Cliquer sur le petit « + »</li>
@@ -172,28 +377,29 @@
         <h3>🚗 En voiture, Simone !</h3>
         <p>Pour conduire, il faut faire traduire son permis français en permis japonais, faisable en ligne <a href="https://english.jaf.or.jp/driving-in-japan/drive-in-japan/switch-to-japanese-license" target="_blank" rel="noopener">ici</a> (il faut être au Japon pour le faire, mais un VPN fonctionne bien). Il faudra ensuite l'imprimer dans un konbini sur place.</p>
       </div>
+
+      <div class="card calendar-card reveal">
+        <div class="image-placeholder voiture-image reveal" data-slot="images/voiture.jpeg">
+          <span class="ph-icon">🚗</span>
+          <span class="ph-label">Photo route / permis<br><small>images/voiture.jpg</small></span>
+        </div>
+      </div>
     </div>
   </section>
 
   <!-- INFOS UTILES -->
   <section id="infos-utiles" class="section alt">
     <div class="section-head reveal">
-      <span class="section-num">04</span>
+      <span class="section-num">05</span>
       <h2>Infos utiles pour vos démarches</h2>
-      <p class="section-intro">À garder sous la main (ou en photo sur votre téléphone) pour l'arrivée.</p>
+      <p class="section-intro">À garder sous la main (en photo sur votre téléphone).</p>
     </div>
 
     <div class="card-grid">
       <div class="card wide reveal">
-        <h3>🏠 Adresse — Lysandre et Louisa</h3>
+        <h3>🏠 Adresse de Lysandre et Louisa</h3>
         <p class="address">〒992-0057 山形県米沢市成島町１丁目４−13 プレジデンシャル 102</p>
         <p class="address">992-0057, Yamagata-ken, Yonezawa-shi, Narushimamachi 1 chome 4-13, Presidential 102</p>
-      </div>
-
-      <div class="card wide reveal">
-        <h3>🗾 Où nous trouver</h3>
-        <p>Yonezawa se trouve dans la préfecture de Yamagata, à quelques heures de Shinkansen au nord de Tokyo.</p>
-        <img src="images/japan-map.png" alt="Carte du Japon avec Yonezawa, Tokyo et le mont Fuji" class="map-image">
       </div>
 
       <div class="card reveal">
@@ -207,63 +413,9 @@
       <div class="card reveal">
         <h3>🈶 Vos noms en japonais</h3>
         <ul>
-          <li>Emmanuelle Praszezynki : プラゼザンキ　エマニュエル</li>
-          <li>Mathieu Praszezynki : プラゼザンキ　マティウ</li>
+          <li>Praszezynki Emmanuelle : プラゼザンキ　エマニュエル</li>
+          <li>Praszezynki Mathieu : プラゼザンキ　マティウ</li>
         </ul>
-      </div>
-    </div>
-  </section>
-
-  <!-- CLIMAT -->
-  <section id="climat" class="section">
-    <div class="section-head reveal">
-      <span class="section-num">05</span>
-      <h2>Le climat</h2>
-      <p class="section-intro">À quoi s'attendre côté météo, et quoi faire en cas de séisme.</p>
-    </div>
-
-    <div class="card-grid">
-      <div class="card wide reveal">
-        <h3>🌡️ Températures moyennes en septembre</h3>
-        <div class="image-placeholder inline" data-slot="images/tokyo-weather.png">
-          <span class="ph-icon">📈</span>
-          <span class="ph-label">Graphique des températures<br><small>images/temperatures.jpg</small></span>
-        </div>
-      </div>
-
-      <div class="card reveal">
-        <h3>🚨 Alertes tremblements de terre</h3>
-        <p>Utilisez l'application <strong>NERV</strong> pour les alertes séismes et tsunamis en temps réel.</p>
-        <p class="note">📲 Pensez aussi à télécharger l'application <strong>Safety Tips</strong> avant de venir, pour les alertes officielles en anglais.</p>
-      </div>
-    </div>
-  </section>
-
-  <!-- CULTURE -->
-  <section id="culture" class="section alt">
-    <div class="section-head reveal">
-      <span class="section-num">06</span>
-      <h2>Culture</h2>
-      <p class="section-intro">Quelques clés pour comprendre les codes sur place — et en profiter sereinement.</p>
-    </div>
-
-    <div class="image-placeholder banner reveal" data-slot="images/inspiration3.png">
-      <span class="ph-icon">⛩️</span>
-      <span class="ph-label">Photo torii / rue japonaise<br><small>images/culture.jpg</small></span>
-    </div>
-
-    <div class="card-grid">
-      <div class="card wide reveal">
-        <h3>🤫 « Ne pas déranger l'autre »</h3>
-        <p>La culture japonaise repose sur ce principe. C'est assez différent de la nôtre et ça se ressent de manière subtile : un accent fort sur le respect, donc sur le silence. Très visible dans le métro, mais aussi partout où l'on partage un espace fermé (ascenseurs, cafés...).</p>
-        <p>Si un restaurant semble réticent à vous servir alors qu'il y a des places libres, c'est en général parce que le personnel ne parle pas anglais et ne veut pas vous mettre dans une situation inconfortable — pas un refus personnel.</p>
-        <p>Il faudra un peu de temps pour s'adapter : même si les Français sont plutôt discrets, on est en général plus bruyants que les Japonais. Et comme on ne vous dira jamais directement que vous faites quelque chose de travers, le mieux est d'essayer d'être aussi respectueux que possible dès le départ.</p>
-        <p class="note">🔗 Ça vaut vraiment le coup de se renseigner sur les codes de politesse à l'avance : <a href="https://japantravel.navitime.com/en/area/jp/guide/NTJauto0028-en/" target="_blank" rel="noopener">guide des bonnes manières au Japon</a>.</p>
-      </div>
-
-      <div class="card reveal">
-        <h3>✈️ Petite anecdote</h3>
-        <p>Dans l'avion pour le Japon, le mont Fuji apparaît côté gauche — un joli coup d'œil depuis le ciel si vous avez une place côté hublot !</p>
       </div>
     </div>
   </section>
@@ -271,14 +423,15 @@
   <!-- FOOTER -->
   <footer class="footer reveal">
     <div class="waves flip"></div>
-    <img src="images/inspiration1.png" alt="" class="footer-stamp">
+    <div class="image-placeholder footer-stamp reveal" data-slot="images/footer-stamp.jpeg">
+      <span class="ph-label">Tampon déco<br><small>images/footer-stamp.jpg</small></span>
+    </div>
     <p class="footer-kicker">お待ちしています</p>
     <h2>On a hâte de vous accueillir !</h2>
-    <p>Si une question vous vient avant le départ, écrivez-nous directement — à très vite à Yonezawa.</p>
   </footer>
 
 </main>
 
-<script src="script.js"></script>
+<script src="script.js?v=2"></script>
 </body>
 </html>

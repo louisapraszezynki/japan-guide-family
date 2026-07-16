@@ -10,6 +10,22 @@ document.querySelectorAll('.image-placeholder[data-slot]').forEach(el => {
   img.src = src;
 });
 
+// Countdown to the trip
+const countdownEl = document.getElementById('countdown');
+if (countdownEl) {
+  const tripStart = new Date('2026-09-03T00:00:00');
+  const tripEnd = new Date('2026-09-23T23:59:59');
+  const now = new Date();
+  if (now < tripStart) {
+    const days = Math.ceil((tripStart - now) / 86400000);
+    countdownEl.textContent = `🎉 J-${days} avant le grand départ !`;
+  } else if (now <= tripEnd) {
+    countdownEl.textContent = `✈️ Vous êtes avec nous en ce moment !`;
+  } else {
+    countdownEl.textContent = `🎉 On espère que ce séjour vous a plu !`;
+  }
+}
+
 // Scroll progress bar
 const progressBar = document.getElementById('progressBar');
 function updateProgress(){

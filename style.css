@@ -230,6 +230,24 @@ a{color:var(--vermillion);}
 .reco-title a{color:inherit; text-decoration:underline; text-decoration-color:var(--vermillion-soft);}
 @media (max-width: 760px){ .reco-list{columns:1;} }
 
+.accordion{columns:2; column-gap:44px; border-top:1px solid var(--line);}
+.accordion-item{border-bottom:1px solid var(--line); break-inside:avoid-column;}
+@media (max-width: 760px){ .accordion{columns:1;} }
+.accordion-item summary{
+  cursor:pointer; list-style:none; padding:18px 4px;
+  display:flex; align-items:center; justify-content:space-between; gap:16px;
+  font-weight:700; color:var(--vermillion); font-size:1.05rem; letter-spacing:.01em;
+}
+.accordion-item summary::-webkit-details-marker{display:none;}
+.accordion-item summary::after{
+  content:'+'; flex:none; font-size:1.4rem; font-weight:400; color:var(--ink-soft);
+  transition:transform .25s ease;
+}
+.accordion-item[open] summary::after{transform:rotate(45deg);}
+.accordion-item summary:hover{color:var(--indigo);}
+.accordion-item p{padding:0 4px; margin-bottom:12px;}
+.accordion-item p:last-of-type{padding-bottom:18px; margin-bottom:0;}
+
 .reco-list.media{columns:unset; display:flex; flex-direction:column; gap:0;}
 .reco.with-media{
   display:flex; gap:24px; align-items:flex-start;

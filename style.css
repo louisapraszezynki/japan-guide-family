@@ -414,6 +414,30 @@ a{color:var(--vermillion);}
 .day-panel-form button:disabled{opacity:.6; cursor:default;}
 @media (max-width: 380px){ .day-panel-form-row{flex-direction:column;} }
 
+.emoji-picker{position:relative;}
+.emoji-picker-trigger{
+  width:100%; display:flex; align-items:center; gap:10px; text-align:left;
+  font-family:inherit; font-size:.95rem; padding:10px 12px;
+  border:1px solid var(--line); border-radius:10px; background:var(--paper);
+  color:var(--ink-soft); cursor:pointer;
+}
+.section.alt .emoji-picker-trigger{background:var(--paper-alt);}
+.emoji-picker-trigger:hover{border-color:var(--vermillion-soft);}
+#dayPanelEmojiPreview{font-size:1.2rem; line-height:1;}
+.emoji-picker-grid{
+  position:absolute; top:calc(100% + 6px); left:0; z-index:10;
+  display:grid; grid-template-columns:repeat(6, 1fr); gap:4px;
+  background:var(--paper); border:1px solid var(--line); border-radius:12px;
+  padding:10px; box-shadow:0 12px 30px -10px rgba(0,0,0,.3);
+  width:min(280px, 100%);
+}
+.emoji-picker-grid button{
+  font-size:1.25rem; padding:6px; border:none; background:none; border-radius:8px;
+  cursor:pointer; line-height:1;
+}
+.emoji-picker-grid button:hover{background:var(--paper-alt);}
+.emoji-picker-grid button.selected{background:var(--vermillion-soft);}
+
 /* day cells: entry-count badge + active state */
 .cal-day.highlight{position:relative; overflow:visible;}
 .cal-day.highlight.has-entries::after{

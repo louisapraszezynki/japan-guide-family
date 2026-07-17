@@ -34,20 +34,21 @@ Chaque date du 3 au 23 septembre est cliquable et affiche, juste à côté du ca
 
 **Configuration (`script.js`, objet `DAY_PLANNER_CONFIG` en haut du fichier) :**
 
-1. Créer un Google Form avec exactement 5 questions, dans cet ordre :
+1. Créer un Google Form avec exactement 6 questions, dans cet ordre :
    1. `Date` (réponse courte)
    2. `Prénom` (réponse courte)
    3. `Idée / événement` (paragraphe)
    4. `Moment` (réponse courte)
    5. `Catégorie` (réponse courte)
+   6. `Emoji personnalisé` (réponse courte) — utilisé quand la catégorie tapée n'est ni « Nourriture » ni « Activité »
 
-   ⚠️ L'ordre d'apparition dans le Sheet suit l'ordre de **création** des questions, pas leur ordre d'affichage dans le Form — donc si on réorganise les questions après coup, les colonnes du Sheet ne bougent pas. Le code lit les colonnes par position (`Idée` = colonne D, `Moment` = colonne E, `Catégorie` = colonne F), donc mieux vaut les créer dans cet ordre dès le départ.
+   ⚠️ L'ordre d'apparition dans le Sheet suit l'ordre de **création** des questions, pas leur ordre d'affichage dans le Form — donc si on réorganise les questions après coup, les colonnes du Sheet ne bougent pas. Le code lit les colonnes par position (`Idée` = colonne D, `Moment` = colonne E, `Catégorie` = colonne F, `Emoji personnalisé` = colonne G), donc mieux vaut les créer dans cet ordre dès le départ.
 2. Dans l'onglet Réponses du Form, cliquer sur l'icône Sheets pour créer la feuille de calcul liée.
 3. Partager cette Sheet en « Toute personne disposant du lien → Lecteur ».
 4. Récupérer :
    - `sheetId` : dans l'URL de la Sheet, la partie entre `/d/` et `/edit`
    - `formAction` : l'URL du Form (celle qui finit par `/viewform`), en remplaçant `viewform` par `formResponse`
-   - `entryDate`, `entryName`, `entryText`, `entryTime`, `entryCategory` : demander à Claude de les récupérer directement depuis la page du Form (pas besoin de lien prérempli manuel), ou ouvrir le Form, menu ⋮ → « Obtenir le lien prérempli », remplir chaque champ avec une valeur différente et facile à repérer, générer le lien, puis relever les `entry.XXXXXXXXX` correspondants dans l'URL générée
+   - `entryDate`, `entryName`, `entryText`, `entryTime`, `entryCategory`, `entryEmoji` : demander à Claude de les récupérer directement depuis la page du Form (pas besoin de lien prérempli manuel), ou ouvrir le Form, menu ⋮ → « Obtenir le lien prérempli », remplir chaque champ avec une valeur différente et facile à repérer, générer le lien, puis relever les `entry.XXXXXXXXX` correspondants dans l'URL générée
 5. Remplacer les valeurs `REPLACE_...` dans `DAY_PLANNER_CONFIG`.
 
 Tant que ce n'est pas configuré, le panneau affiche un message « pas encore configurée » au lieu de planter.

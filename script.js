@@ -59,6 +59,7 @@ const DAY_PLANNER_CONFIG = {
   entryText: 'entry.1852794116',
   entryTime: 'entry.1117304232',
   entryCategory: 'entry.1406253915',
+  entryEmoji: 'entry.977247865',
 };
 
 const TIME_RANKS = {
@@ -74,6 +75,10 @@ function getTimeRank(label){
   if (norm in TIME_RANKS) return TIME_RANKS[norm];
   const m = /(\d{1,2})/.exec(norm);
   return m ? parseInt(m[1], 10) : 99;
+}
+function isPresetCategory(label){
+  const norm = (label || '').trim().toLowerCase();
+  return norm === 'nourriture' || norm === 'activité' || norm === 'activite';
 }
 function getCategoryMeta(label){
   const norm = (label || '').trim().toLowerCase();
@@ -94,6 +99,19 @@ function getCategoryMeta(label){
   const nameInput = document.getElementById('dayPanelName');
   const timeInput = document.getElementById('dayPanelTime');
   const categoryInput = document.getElementById('dayPanelCategory');
+  const categoryEmojiInput = document.getElementById('dayPanelCategoryEmoji');
+  const emojiPicker = document.getElementById('dayPanelEmojiPicker');
+  const emojiTrigger = document.getElementById('dayPanelEmojiTrigger');
+  const emojiGrid = document.getElementById('dayPanelEmojiGrid');
+  const emojiPreview = document.getElementById('dayPanelEmojiPreview');
+
+  function resetEmojiPicker(){
+    categoryEmojiInput.value = '';
+    emojiPreview.textContent = '🙂';
+    emojiGrid.hidden = true;
+    emojiPicker.hidden = true;
+    emojiGrid.querySelectorAll('button.selected').forEach(b => b.classList.remove('selected'));
+  }
   const textInput = document.getElementById('dayPanelText');
   const formStatus = document.getElementById('dayPanelStatus');
   const dayButtons = document.querySelectorAll('.cal-day.highlight[data-date]');
@@ -182,6 +200,7 @@ function getCategoryMeta(label){
             text: (c[3] && c[3].v) || '',
             time: (c[4] && c[4].v) || '',
             category: (c[5] && c[5].v) || '',
+            emoji: (c[6] && c[6].v) || '',
           };
         }).filter(item => item.date && item.text);
         updateBadges();
@@ -212,7 +231,8 @@ function getCategoryMeta(label){
         : items.length
           ? items.map(item => {
               const cat = getCategoryMeta(item.category);
-              return `<div class="week-entry ${cat.cls}">${cat.icon} ${escapeHtml(item.text)}</div>`;
+              const icon = item.emoji || cat.icon;
+              return `<div class="week-entry ${cat.cls}">${icon} ${escapeHtml(item.text)}</div>`;
             }).join('')
           : '<p class="week-day-empty">—</p>';
 
@@ -254,10 +274,11 @@ function getCategoryMeta(label){
     }
     entriesEl.innerHTML = items.map(item => {
       const cat = getCategoryMeta(item.category);
+      const icon = item.emoji || cat.icon;
       return `<div class="day-entry ${cat.cls}">
         <div class="day-entry-meta">
           ${item.time ? `<span class="day-entry-time">🕐 ${escapeHtml(item.time)}</span>` : ''}
-          ${item.category ? `<span class="day-entry-category">${cat.icon} ${escapeHtml(item.category)}</span>` : ''}
+          ${item.category ? `<span class="day-entry-category">${icon} ${escapeHtml(item.category)}</span>` : ''}
         </div>
         <p><span class="day-entry-name">${escapeHtml(item.name)} :</span>${escapeHtml(item.text)}</p>
       </div>`;
@@ -275,6 +296,7 @@ function getCategoryMeta(label){
     if (savedName) nameInput.value = savedName;
     timeInput.value = '';
     categoryInput.value = '';
+    resetEmojiPicker();
     textInput.value = '';
     formStatus.textContent = '';
 
@@ -301,6 +323,29 @@ function getCategoryMeta(label){
   });
   resetBtn.addEventListener('click', resetPanel);
 
+  categoryInput.addEventListener('input', () => {
+    const custom = categoryInput.value.trim() && !isPresetCategory(categoryInput.value);
+    emojiPicker.hidden = !custom;
+    if (!custom) resetEmojiPicker();
+  });
+
+  emojiTrigger.addEventListener('click', () => {
+    emojiGrid.hidden = !emojiGrid.hidden;
+  });
+  emojiGrid.querySelectorAll('button[data-emoji]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const emoji = btn.getAttribute('data-emoji');
+      categoryEmojiInput.value = emoji;
+      emojiPreview.textContent = emoji;
+      emojiGrid.querySelectorAll('button.selected').forEach(b => b.classList.remove('selected'));
+      btn.classList.add('selected');
+      emojiGrid.hidden = true;
+    });
+  });
+  document.addEventListener('click', e => {
+    if (!emojiPicker.hidden && !emojiPicker.contains(e.target)) emojiGrid.hidden = true;
+  });
+
   if (weekPrevBtn && weekNextBtn) {
     weekPrevBtn.addEventListener('click', () => { currentWeekIndex--; renderWeekView(); });
     weekNextBtn.addEventListener('click', () => { currentWeekIndex++; renderWeekView(); });
@@ -316,8 +361,13 @@ function getCategoryMeta(label){
     const name = nameInput.value.trim();
     const time = timeInput.value.trim();
     const category = categoryInput.value.trim();
+    const emoji = emojiPicker.hidden ? '' : categoryEmojiInput.value.trim();
     const text = textInput.value.trim();
     if (!name || !time || !category || !text) return;
+    if (!isPresetCategory(category) && !emoji) {
+      formStatus.textContent = 'Choisissez un émoji pour votre catégorie personnalisée.';
+      return;
+    }
     localStorage.setItem('familyName', name);
 
     const submitBtn = form.querySelector('button');
@@ -330,17 +380,19 @@ function getCategoryMeta(label){
     body.append(DAY_PLANNER_CONFIG.entryText, text);
     body.append(DAY_PLANNER_CONFIG.entryTime, time);
     body.append(DAY_PLANNER_CONFIG.entryCategory, category);
+    body.append(DAY_PLANNER_CONFIG.entryEmoji, emoji);
 
     fetch(DAY_PLANNER_CONFIG.formAction, { method: 'POST', mode: 'no-cors', body })
       .catch(() => {})
       .finally(() => {
-        allEntries.push({ date: currentDate, name, text, time, category });
+        allEntries.push({ date: currentDate, name, text, time, category, emoji });
         updateBadges();
         renderEntriesFor(currentDate);
         renderWeekView();
         textInput.value = '';
         timeInput.value = '';
         categoryInput.value = '';
+        resetEmojiPicker();
         formStatus.textContent = 'Ajouté !';
         submitBtn.disabled = false;
         setTimeout(() => { formStatus.textContent = ''; }, 2000);

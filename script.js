@@ -281,6 +281,8 @@ function makeSortable(container, onReorder, onDragStateChange){
       if (entry) entry.order = index;
     });
     updateBadges();
+    renderWeekView();
+    if (dateStr === currentDate) renderEntriesFor(dateStr);
     if (!isConfigured()) return;
     fetch(DAY_PLANNER_CONFIG.apiUrl, {
       method: 'POST',

@@ -112,6 +112,78 @@ function getCategoryMeta(label){
     emojiPicker.hidden = true;
     emojiGrid.querySelectorAll('button.selected').forEach(b => b.classList.remove('selected'));
   }
+
+  function setupOptionPicker({ container, trigger, menu, preview, customInput, hiddenInput, placeholder, onCustomToggle }){
+    trigger.addEventListener('click', () => { menu.hidden = !menu.hidden; });
+
+    menu.querySelectorAll('button[data-value]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const value = btn.getAttribute('data-value');
+        menu.querySelectorAll('button.selected').forEach(b => b.classList.remove('selected'));
+        btn.classList.add('selected');
+        menu.hidden = true;
+        if (value === '__custom__') {
+          hiddenInput.value = '';
+          preview.textContent = 'Personnalisé';
+          customInput.hidden = false;
+          customInput.value = '';
+          customInput.focus();
+          if (onCustomToggle) onCustomToggle(true);
+        } else {
+          customInput.hidden = true;
+          customInput.value = '';
+          hiddenInput.value = value;
+          preview.textContent = value;
+          if (onCustomToggle) onCustomToggle(false);
+        }
+      });
+    });
+
+    customInput.addEventListener('input', () => {
+      hiddenInput.value = customInput.value.trim();
+      preview.textContent = customInput.value.trim() || 'Personnalisé';
+    });
+
+    document.addEventListener('click', e => {
+      if (!menu.hidden && !container.contains(e.target)) menu.hidden = true;
+    });
+
+    return {
+      reset(){
+        hiddenInput.value = '';
+        preview.textContent = placeholder;
+        menu.hidden = true;
+        customInput.hidden = true;
+        customInput.value = '';
+        menu.querySelectorAll('button.selected').forEach(b => b.classList.remove('selected'));
+        if (onCustomToggle) onCustomToggle(false);
+      },
+    };
+  }
+
+  const timePicker = setupOptionPicker({
+    container: document.getElementById('dayPanelTimePicker'),
+    trigger: document.getElementById('dayPanelTimeTrigger'),
+    menu: document.getElementById('dayPanelTimeMenu'),
+    preview: document.getElementById('dayPanelTimePreview'),
+    customInput: document.getElementById('dayPanelTimeCustom'),
+    hiddenInput: timeInput,
+    placeholder: 'Choisir un moment',
+  });
+
+  const categoryPicker = setupOptionPicker({
+    container: document.getElementById('dayPanelCategoryPicker'),
+    trigger: document.getElementById('dayPanelCategoryTrigger'),
+    menu: document.getElementById('dayPanelCategoryMenu'),
+    preview: document.getElementById('dayPanelCategoryPreview'),
+    customInput: document.getElementById('dayPanelCategoryCustom'),
+    hiddenInput: categoryInput,
+    placeholder: 'Choisir une catégorie',
+    onCustomToggle: isCustom => {
+      emojiPicker.hidden = !isCustom;
+      if (!isCustom) resetEmojiPicker();
+    },
+  });
   const textInput = document.getElementById('dayPanelText');
   const formStatus = document.getElementById('dayPanelStatus');
   const dayButtons = document.querySelectorAll('.cal-day.highlight[data-date]');
@@ -294,9 +366,8 @@ function getCategoryMeta(label){
     titleEl.textContent = label.charAt(0).toUpperCase() + label.slice(1);
     const savedName = localStorage.getItem('familyName');
     if (savedName) nameInput.value = savedName;
-    timeInput.value = '';
-    categoryInput.value = '';
-    resetEmojiPicker();
+    timePicker.reset();
+    categoryPicker.reset();
     textInput.value = '';
     formStatus.textContent = '';
 
@@ -322,12 +393,6 @@ function getCategoryMeta(label){
     btn.addEventListener('click', () => selectDay(btn.getAttribute('data-date'), btn));
   });
   resetBtn.addEventListener('click', resetPanel);
-
-  categoryInput.addEventListener('input', () => {
-    const custom = categoryInput.value.trim() && !isPresetCategory(categoryInput.value);
-    emojiPicker.hidden = !custom;
-    if (!custom) resetEmojiPicker();
-  });
 
   emojiTrigger.addEventListener('click', () => {
     emojiGrid.hidden = !emojiGrid.hidden;
@@ -363,7 +428,10 @@ function getCategoryMeta(label){
     const category = categoryInput.value.trim();
     const emoji = emojiPicker.hidden ? '' : categoryEmojiInput.value.trim();
     const text = textInput.value.trim();
-    if (!name || !time || !category || !text) return;
+    if (!name) { formStatus.textContent = 'Merci de renseigner votre prénom.'; return; }
+    if (!time) { formStatus.textContent = 'Merci de choisir un moment.'; return; }
+    if (!category) { formStatus.textContent = 'Merci de choisir une catégorie.'; return; }
+    if (!text) { formStatus.textContent = 'Merci de décrire votre idée.'; return; }
     if (!isPresetCategory(category) && !emoji) {
       formStatus.textContent = 'Choisissez un émoji pour votre catégorie personnalisée.';
       return;
@@ -390,9 +458,8 @@ function getCategoryMeta(label){
         renderEntriesFor(currentDate);
         renderWeekView();
         textInput.value = '';
-        timeInput.value = '';
-        categoryInput.value = '';
-        resetEmojiPicker();
+        timePicker.reset();
+        categoryPicker.reset();
         formStatus.textContent = 'Ajouté !';
         submitBtn.disabled = false;
         setTimeout(() => { formStatus.textContent = ''; }, 2000);

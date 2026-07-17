@@ -431,6 +431,7 @@ a{color:var(--vermillion);}
   padding:10px; box-shadow:0 12px 30px -10px rgba(0,0,0,.3);
   width:min(280px, 100%);
 }
+.emoji-picker-grid[hidden]{display:none;}
 .emoji-picker-grid button{
   font-size:1.25rem; padding:6px; border:none; background:none; border-radius:8px;
   cursor:pointer; line-height:1;

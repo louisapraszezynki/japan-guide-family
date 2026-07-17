@@ -265,6 +265,9 @@ function getCategoryMeta(label){
     titleEl.textContent = label.charAt(0).toUpperCase() + label.slice(1);
     const savedName = localStorage.getItem('familyName');
     if (savedName) nameInput.value = savedName;
+    timeInput.value = '';
+    categoryInput.value = '';
+    textInput.value = '';
     formStatus.textContent = '';
 
     emptyState.hidden = true;
@@ -328,6 +331,8 @@ function getCategoryMeta(label){
         renderEntriesFor(currentDate);
         renderWeekView();
         textInput.value = '';
+        timeInput.value = '';
+        categoryInput.value = '';
         formStatus.textContent = 'Ajouté !';
         submitBtn.disabled = false;
         setTimeout(() => { formStatus.textContent = ''; }, 2000);

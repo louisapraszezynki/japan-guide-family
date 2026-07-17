@@ -347,6 +347,7 @@ a{color:var(--vermillion);}
   flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center;
   text-align:center; gap:12px; color:var(--ink-soft); padding:24px 8px;
 }
+.day-panel-empty[hidden], .day-panel-content[hidden]{display:none;}
 .day-panel-empty .ph-icon{font-size:2rem;}
 .day-panel-header{
   display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:16px;

@@ -236,6 +236,12 @@ function getCategoryMeta(label){
     }
   }
 
+  function updateScrollFade(){
+    const fade = document.getElementById('dayPanelScrollFade');
+    if (!fade) return;
+    fade.classList.toggle('show', entriesEl.scrollHeight > entriesEl.clientHeight + 2);
+  }
+
   function renderEntriesFor(dateStr){
     const items = allEntries
       .filter(item => item.date === dateStr)
@@ -243,6 +249,7 @@ function getCategoryMeta(label){
       .sort((a, b) => getTimeRank(a.time) - getTimeRank(b.time));
     if (!items.length) {
       entriesEl.innerHTML = '<p class="day-panel-status">Rien de prévu pour l\'instant. Soyez le premier !</p>';
+      updateScrollFade();
       return;
     }
     entriesEl.innerHTML = items.map(item => {
@@ -255,6 +262,7 @@ function getCategoryMeta(label){
         <p><span class="day-entry-name">${escapeHtml(item.name)} :</span>${escapeHtml(item.text)}</p>
       </div>`;
     }).join('');
+    updateScrollFade();
   }
 
   function selectDay(dateStr, btn){

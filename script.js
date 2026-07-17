@@ -302,7 +302,10 @@ function makeSortable(container, onReorder, onDragStateChange){
       const dateStr = toDateStr(dt);
       const inTrip = dateStr >= TRIP_START && dateStr <= TRIP_END;
       const label = dt.toLocaleDateString('fr-FR', { weekday: 'short', day: 'numeric' });
-      const items = allEntries.filter(item => item.date === dateStr);
+      const items = allEntries
+        .filter(item => item.date === dateStr)
+        .slice()
+        .sort((a, b) => (Number(a.order) || 0) - (Number(b.order) || 0));
 
       const body = !inTrip
         ? ''
@@ -346,7 +349,10 @@ function makeSortable(container, onReorder, onDragStateChange){
   }
 
   function renderEntriesFor(dateStr){
-    const items = allEntries.filter(item => item.date === dateStr);
+    const items = allEntries
+      .filter(item => item.date === dateStr)
+      .slice()
+      .sort((a, b) => (Number(a.order) || 0) - (Number(b.order) || 0));
     if (!items.length) {
       entriesEl.innerHTML = '<p class="day-panel-status">Rien de prévu pour l\'instant. Soyez le premier !</p>';
       updateScrollFade();

@@ -367,12 +367,17 @@ a{color:var(--vermillion);}
 .day-panel-entries::-webkit-scrollbar-thumb{background:var(--vermillion-soft); border-radius:3px;}
 .day-panel-entries::-webkit-scrollbar-track{background:transparent;}
 .day-panel-scroll-fade{
-  position:absolute; left:0; right:0; bottom:0; height:32px; border-radius:0 0 10px 10px;
-  background:linear-gradient(to bottom, transparent, var(--paper-alt) 75%);
+  position:absolute; left:0; right:0; bottom:0; height:52px; border-radius:0 0 10px 10px;
+  background:linear-gradient(to bottom, transparent, var(--paper-alt) 55%, var(--paper-alt) 100%);
   pointer-events:none; opacity:0; transition:opacity .2s ease;
+  display:flex; align-items:flex-end; justify-content:center; padding-bottom:4px;
 }
-.section.alt .day-panel-scroll-fade{background:linear-gradient(to bottom, transparent, var(--paper) 75%);}
+.section.alt .day-panel-scroll-fade{background:linear-gradient(to bottom, transparent, var(--paper) 55%, var(--paper) 100%);}
 .day-panel-scroll-fade.show{opacity:1;}
+.day-panel-scroll-fade::after{
+  content:'▾ défiler'; font-size:.68rem; color:var(--vermillion); font-weight:700;
+  letter-spacing:.03em;
+}
 .day-panel-status{color:var(--ink-soft); font-size:.88rem;}
 .day-entry{
   background:var(--paper-alt); border-radius:10px; padding:10px 14px; font-size:.92rem;

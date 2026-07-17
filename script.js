@@ -57,19 +57,48 @@ const DAY_PLANNER_CONFIG = {
   entryDate: 'entry.295084129',
   entryName: 'entry.774320166',
   entryText: 'entry.1852794116',
+  entryTime: 'entry.1117304232',
+  entryCategory: 'entry.1406253915',
 };
 
-(function initDayPlanner(){
-  const overlay = document.getElementById('dayModalOverlay');
-  if (!overlay) return;
+const TIME_RANKS = {
+  'toute la journée (9h-19h)': -1,
+  'matin (9h-12h)': 9,
+  'déjeuner (12h)': 12,
+  'après-midi (14h-16h)': 14,
+  'soirée (17h-20h)': 17,
+  'dîner (19h)': 19,
+};
+function getTimeRank(label){
+  const norm = (label || '').trim().toLowerCase();
+  if (norm in TIME_RANKS) return TIME_RANKS[norm];
+  const m = /(\d{1,2})/.exec(norm);
+  return m ? parseInt(m[1], 10) : 99;
+}
+function getCategoryMeta(label){
+  const norm = (label || '').trim().toLowerCase();
+  if (norm === 'nourriture') return { icon: '🍜', cls: 'cat-food' };
+  if (norm === 'activité' || norm === 'activite') return { icon: '🎌', cls: 'cat-activity' };
+  return { icon: '✏️', cls: 'cat-custom' };
+}
 
-  const titleEl = document.getElementById('dayModalTitle');
-  const entriesEl = document.getElementById('dayModalEntries');
-  const closeBtn = document.getElementById('dayModalClose');
-  const form = document.getElementById('dayModalForm');
-  const nameInput = document.getElementById('dayModalName');
-  const textInput = document.getElementById('dayModalText');
-  const formStatus = document.getElementById('dayModalFormStatus');
+(function initDayPlanner(){
+  const emptyState = document.getElementById('dayPanelEmpty');
+  const contentState = document.getElementById('dayPanelContent');
+  if (!emptyState || !contentState) return;
+
+  const titleEl = document.getElementById('dayPanelTitle');
+  const entriesEl = document.getElementById('dayPanelEntries');
+  const resetBtn = document.getElementById('dayPanelReset');
+  const form = document.getElementById('dayPanelForm');
+  const nameInput = document.getElementById('dayPanelName');
+  const timeInput = document.getElementById('dayPanelTime');
+  const categoryInput = document.getElementById('dayPanelCategory');
+  const textInput = document.getElementById('dayPanelText');
+  const formStatus = document.getElementById('dayPanelStatus');
+  const dayButtons = document.querySelectorAll('.cal-day.highlight[data-date]');
+
+  let allEntries = [];
   let currentDate = null;
 
   function isConfigured(){
@@ -91,77 +120,105 @@ const DAY_PLANNER_CONFIG = {
     return String(raw).trim();
   }
 
-  function renderEntries(items){
-    if (!items.length) {
-      entriesEl.innerHTML = '<p class="day-modal-status">Rien de prévu pour l\'instant. Soyez le premier !</p>';
-      return;
-    }
-    entriesEl.innerHTML = items.map(item =>
-      `<div class="day-entry"><span class="day-entry-name">${escapeHtml(item.name)}</span>${escapeHtml(item.text)}</div>`
-    ).join('');
+  function updateBadges(){
+    const counts = {};
+    allEntries.forEach(e => { counts[e.date] = (counts[e.date] || 0) + 1; });
+    dayButtons.forEach(btn => {
+      const n = counts[btn.getAttribute('data-date')] || 0;
+      btn.classList.toggle('has-entries', n > 0);
+      if (n > 0) btn.setAttribute('data-count', n); else btn.removeAttribute('data-count');
+    });
   }
 
-  function fetchEntries(dateStr){
-    if (!isConfigured()) {
-      entriesEl.innerHTML = '<p class="day-modal-status">La liste partagée n\'est pas encore configurée.</p>';
-      return;
-    }
-    entriesEl.innerHTML = '<p class="day-modal-status">Chargement...</p>';
+  function fetchAllEntries(){
+    if (!isConfigured()) return;
     const url = `https://docs.google.com/spreadsheets/d/${DAY_PLANNER_CONFIG.sheetId}/gviz/tq?tqx=out:json&gid=0&_=${Date.now()}`;
-    fetch(url)
+    return fetch(url)
       .then(res => res.text())
       .then(text => {
         const jsonStr = text.substring(text.indexOf('(') + 1, text.lastIndexOf(')'));
         const data = JSON.parse(jsonStr);
         const rows = (data.table && data.table.rows) || [];
-        const items = rows.map(row => {
+        allEntries = rows.map(row => {
           const c = row.c || [];
           return {
             date: normalizeSheetDate(c[1] && c[1].v),
             name: (c[2] && c[2].v) || '',
             text: (c[3] && c[3].v) || '',
+            time: (c[4] && c[4].v) || '',
+            category: (c[5] && c[5].v) || '',
           };
-        }).filter(item => item.date === dateStr && item.text);
-        renderEntries(items);
+        }).filter(item => item.date && item.text);
+        updateBadges();
       })
-      .catch(() => {
-        entriesEl.innerHTML = '<p class="day-modal-status">Impossible de charger la liste pour le moment.</p>';
-      });
+      .catch(() => {});
   }
 
-  function openModal(dateStr){
+  function renderEntriesFor(dateStr){
+    const items = allEntries
+      .filter(item => item.date === dateStr)
+      .slice()
+      .sort((a, b) => getTimeRank(a.time) - getTimeRank(b.time));
+    if (!items.length) {
+      entriesEl.innerHTML = '<p class="day-panel-status">Rien de prévu pour l\'instant. Soyez le premier !</p>';
+      return;
+    }
+    entriesEl.innerHTML = items.map(item => {
+      const cat = getCategoryMeta(item.category);
+      return `<div class="day-entry ${cat.cls}">
+        <div class="day-entry-meta">
+          ${item.time ? `<span class="day-entry-time">🕐 ${escapeHtml(item.time)}</span>` : ''}
+          ${item.category ? `<span class="day-entry-category">${cat.icon} ${escapeHtml(item.category)}</span>` : ''}
+        </div>
+        <p><span class="day-entry-name">${escapeHtml(item.name)} :</span>${escapeHtml(item.text)}</p>
+      </div>`;
+    }).join('');
+  }
+
+  function selectDay(dateStr, btn){
     currentDate = dateStr;
+    dayButtons.forEach(b => b.classList.toggle('active-day', b === btn));
+
     const label = new Date(dateStr + 'T00:00:00').toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' });
     titleEl.textContent = label.charAt(0).toUpperCase() + label.slice(1);
     const savedName = localStorage.getItem('familyName');
     if (savedName) nameInput.value = savedName;
     formStatus.textContent = '';
-    overlay.classList.add('open');
-    document.body.style.overflow = 'hidden';
-    fetchEntries(dateStr);
+
+    emptyState.hidden = true;
+    contentState.hidden = false;
+
+    if (!isConfigured()) {
+      entriesEl.innerHTML = '<p class="day-panel-status">La liste partagée n\'est pas encore configurée.</p>';
+      return;
+    }
+    entriesEl.innerHTML = '<p class="day-panel-status">Chargement...</p>';
+    renderEntriesFor(dateStr);
   }
 
-  function closeModal(){
-    overlay.classList.remove('open');
-    document.body.style.overflow = '';
+  function resetPanel(){
+    currentDate = null;
+    dayButtons.forEach(b => b.classList.remove('active-day'));
+    emptyState.hidden = false;
+    contentState.hidden = true;
   }
 
-  document.querySelectorAll('.cal-day.highlight[data-date]').forEach(btn => {
-    btn.addEventListener('click', () => openModal(btn.getAttribute('data-date')));
+  dayButtons.forEach(btn => {
+    btn.addEventListener('click', () => selectDay(btn.getAttribute('data-date'), btn));
   });
-  closeBtn.addEventListener('click', closeModal);
-  overlay.addEventListener('click', e => { if (e.target === overlay) closeModal(); });
-  document.addEventListener('keydown', e => { if (e.key === 'Escape' && overlay.classList.contains('open')) closeModal(); });
+  resetBtn.addEventListener('click', resetPanel);
 
   form.addEventListener('submit', e => {
     e.preventDefault();
-    if (!isConfigured()) {
+    if (!isConfigured() || !currentDate) {
       formStatus.textContent = "La liste partagée n'est pas encore configurée.";
       return;
     }
     const name = nameInput.value.trim();
+    const time = timeInput.value.trim();
+    const category = categoryInput.value.trim();
     const text = textInput.value.trim();
-    if (!name || !text) return;
+    if (!name || !time || !category || !text) return;
     localStorage.setItem('familyName', name);
 
     const submitBtn = form.querySelector('button');
@@ -172,21 +229,23 @@ const DAY_PLANNER_CONFIG = {
     body.append(DAY_PLANNER_CONFIG.entryDate, currentDate);
     body.append(DAY_PLANNER_CONFIG.entryName, name);
     body.append(DAY_PLANNER_CONFIG.entryText, text);
+    body.append(DAY_PLANNER_CONFIG.entryTime, time);
+    body.append(DAY_PLANNER_CONFIG.entryCategory, category);
 
     fetch(DAY_PLANNER_CONFIG.formAction, { method: 'POST', mode: 'no-cors', body })
       .catch(() => {})
       .finally(() => {
-        if (entriesEl.querySelector('.day-modal-status')) entriesEl.innerHTML = '';
-        const entry = document.createElement('div');
-        entry.className = 'day-entry';
-        entry.innerHTML = `<span class="day-entry-name">${escapeHtml(name)}</span>${escapeHtml(text)}`;
-        entriesEl.appendChild(entry);
+        allEntries.push({ date: currentDate, name, text, time, category });
+        updateBadges();
+        renderEntriesFor(currentDate);
         textInput.value = '';
         formStatus.textContent = 'Ajouté !';
         submitBtn.disabled = false;
         setTimeout(() => { formStatus.textContent = ''; }, 2000);
       });
   });
+
+  fetchAllEntries();
 })();
 
 // Active dot nav tracking

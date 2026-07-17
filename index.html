@@ -8,7 +8,7 @@
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⛩️</text></svg>">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;700&family=Zen+Maru+Gothic:wght@400;500;700&display=swap">
-<link rel="stylesheet" href="style.css?v=22">
+<link rel="stylesheet" href="style.css?v=24">
 </head>
 <body>
 
@@ -101,6 +101,45 @@
       </div>
 
       <div class="card reveal">
+        <div class="day-panel" id="dayPanel">
+          <div class="day-panel-empty" id="dayPanelEmpty">
+            <span class="ph-icon">🗓️</span>
+            <p>Cliquez sur une date du calendrier (3 au 23 septembre) pour voir ou proposer des idées pour ce jour-là !</p>
+          </div>
+
+          <div class="day-panel-content" id="dayPanelContent" hidden>
+            <div class="day-panel-header">
+              <h4 id="dayPanelTitle"></h4>
+              <button type="button" class="day-panel-reset" id="dayPanelReset" aria-label="Fermer">✕</button>
+            </div>
+            <div class="day-panel-entries" id="dayPanelEntries"></div>
+            <form class="day-panel-form" id="dayPanelForm">
+              <input type="text" id="dayPanelName" placeholder="Votre prénom" autocomplete="name" required>
+              <div class="day-panel-form-row">
+                <input type="text" id="dayPanelTime" list="dayPanelTimeOptions" placeholder="Moment (matin, déjeuner...)" required>
+                <input type="text" id="dayPanelCategory" list="dayPanelCategoryOptions" placeholder="Catégorie (nourriture...)" required>
+              </div>
+              <datalist id="dayPanelTimeOptions">
+                <option value="Matin (9h-12h)"></option>
+                <option value="Déjeuner (12h)"></option>
+                <option value="Après-midi (14h-16h)"></option>
+                <option value="Soirée (17h-20h)"></option>
+                <option value="Dîner (19h)"></option>
+                <option value="Toute la journée (9h-19h)"></option>
+              </datalist>
+              <datalist id="dayPanelCategoryOptions">
+                <option value="Nourriture"></option>
+                <option value="Activité"></option>
+              </datalist>
+              <textarea id="dayPanelText" placeholder="Une idée, une envie, un évènement..." rows="2" required></textarea>
+              <button type="submit">Ajouter</button>
+            </form>
+            <p class="day-panel-status" id="dayPanelStatus"></p>
+          </div>
+        </div>
+      </div>
+
+      <div class="card wide reveal">
         <h3>🏠 Notre maison</h3>
         <p>Yonezawa se trouve dans la préfecture de Yamagata, à quelques heures de Shinkansen au nord de Tokyo.</p>
         <div class="image-placeholder map-image reveal" data-slot="images/japan-map.png">
@@ -433,24 +472,6 @@
 
 </main>
 
-<div class="day-modal-overlay" id="dayModalOverlay">
-  <div class="day-modal" role="dialog" aria-modal="true" aria-labelledby="dayModalTitle">
-    <button type="button" class="day-modal-close" id="dayModalClose" aria-label="Fermer">✕</button>
-    <h3 id="dayModalTitle"></h3>
-
-    <div class="day-modal-entries" id="dayModalEntries">
-      <p class="day-modal-status">Chargement...</p>
-    </div>
-
-    <form class="day-modal-form" id="dayModalForm">
-      <input type="text" id="dayModalName" placeholder="Votre prénom" autocomplete="name" required>
-      <textarea id="dayModalText" placeholder="Une idée, une envie, un évènement..." rows="2" required></textarea>
-      <button type="submit">Ajouter</button>
-    </form>
-    <p class="day-modal-status" id="dayModalFormStatus"></p>
-  </div>
-</div>
-
-<script src="script.js?v=4"></script>
+<script src="script.js?v=7"></script>
 </body>
 </html>

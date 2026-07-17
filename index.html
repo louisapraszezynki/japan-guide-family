@@ -8,7 +8,7 @@
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⛩️</text></svg>">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;700&family=Zen+Maru+Gothic:wght@400;500;700&display=swap">
-<link rel="stylesheet" href="style.css?v=21">
+<link rel="stylesheet" href="style.css?v=22">
 </head>
 <body>
 
@@ -62,27 +62,27 @@
             <span class="cal-day muted">31</span>
             <span class="cal-day">1</span>
             <span class="cal-day">2</span>
-            <span class="cal-day highlight">3</span>
-            <span class="cal-day highlight">4</span>
-            <span class="cal-day highlight">5</span>
-            <span class="cal-day highlight">6</span>
-            <span class="cal-day highlight">7</span>
-            <span class="cal-day highlight">8</span>
-            <span class="cal-day highlight">9</span>
-            <span class="cal-day highlight">10</span>
-            <span class="cal-day highlight">11</span>
-            <span class="cal-day highlight">12</span>
-            <span class="cal-day highlight">13</span>
-            <span class="cal-day highlight">14</span>
-            <span class="cal-day highlight">15</span>
-            <span class="cal-day highlight">16</span>
-            <span class="cal-day highlight">17</span>
-            <span class="cal-day highlight">18</span>
-            <span class="cal-day highlight">19</span>
-            <span class="cal-day highlight">20</span>
-            <span class="cal-day highlight">21</span>
-            <span class="cal-day highlight">22</span>
-            <span class="cal-day highlight">23</span>
+            <button type="button" class="cal-day highlight" data-date="2026-09-03">3</button>
+            <button type="button" class="cal-day highlight" data-date="2026-09-04">4</button>
+            <button type="button" class="cal-day highlight" data-date="2026-09-05">5</button>
+            <button type="button" class="cal-day highlight" data-date="2026-09-06">6</button>
+            <button type="button" class="cal-day highlight" data-date="2026-09-07">7</button>
+            <button type="button" class="cal-day highlight" data-date="2026-09-08">8</button>
+            <button type="button" class="cal-day highlight" data-date="2026-09-09">9</button>
+            <button type="button" class="cal-day highlight" data-date="2026-09-10">10</button>
+            <button type="button" class="cal-day highlight" data-date="2026-09-11">11</button>
+            <button type="button" class="cal-day highlight" data-date="2026-09-12">12</button>
+            <button type="button" class="cal-day highlight" data-date="2026-09-13">13</button>
+            <button type="button" class="cal-day highlight" data-date="2026-09-14">14</button>
+            <button type="button" class="cal-day highlight" data-date="2026-09-15">15</button>
+            <button type="button" class="cal-day highlight" data-date="2026-09-16">16</button>
+            <button type="button" class="cal-day highlight" data-date="2026-09-17">17</button>
+            <button type="button" class="cal-day highlight" data-date="2026-09-18">18</button>
+            <button type="button" class="cal-day highlight" data-date="2026-09-19">19</button>
+            <button type="button" class="cal-day highlight" data-date="2026-09-20">20</button>
+            <button type="button" class="cal-day highlight" data-date="2026-09-21">21</button>
+            <button type="button" class="cal-day highlight" data-date="2026-09-22">22</button>
+            <button type="button" class="cal-day highlight" data-date="2026-09-23">23</button>
             <span class="cal-day">24</span>
             <span class="cal-day">25</span>
             <span class="cal-day">26</span>
@@ -95,6 +95,7 @@
             <span class="cal-day muted">3</span>
             <span class="cal-day muted">4</span>
           </div>
+          <p class="calendar-hint">👉 Cliquez sur une date pour proposer une idée ou voir le programme !</p>
           <p class="calendar-countdown" id="countdown"></p>
         </div>
       </div>
@@ -432,6 +433,24 @@
 
 </main>
 
-<script src="script.js?v=2"></script>
+<div class="day-modal-overlay" id="dayModalOverlay">
+  <div class="day-modal" role="dialog" aria-modal="true" aria-labelledby="dayModalTitle">
+    <button type="button" class="day-modal-close" id="dayModalClose" aria-label="Fermer">✕</button>
+    <h3 id="dayModalTitle"></h3>
+
+    <div class="day-modal-entries" id="dayModalEntries">
+      <p class="day-modal-status">Chargement...</p>
+    </div>
+
+    <form class="day-modal-form" id="dayModalForm">
+      <input type="text" id="dayModalName" placeholder="Votre prénom" autocomplete="name" required>
+      <textarea id="dayModalText" placeholder="Une idée, une envie, un évènement..." rows="2" required></textarea>
+      <button type="submit">Ajouter</button>
+    </form>
+    <p class="day-modal-status" id="dayModalFormStatus"></p>
+  </div>
+</div>
+
+<script src="script.js?v=4"></script>
 </body>
 </html>

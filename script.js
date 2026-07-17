@@ -49,42 +49,116 @@ const revealObserver = new IntersectionObserver((entries) => {
 }, { threshold: 0.15, rootMargin: '0px 0px -60px 0px' });
 revealEls.forEach(el => revealObserver.observe(el));
 
-// ---------- Day planner (shared via a Google Form + Sheet) ----------
-// Fill these in once the Form/Sheet exist (see README.md).
+// ---------- Day planner (shared via a Google Apps Script Web App) ----------
+// Fill this in once the Apps Script is deployed (see README.md).
 const DAY_PLANNER_CONFIG = {
-  sheetId: '12cnec0Vt5q7XTV1TypvKn58hk7UMQGYOc-dWym2DGHM',
-  formAction: 'https://docs.google.com/forms/d/e/1FAIpQLSdj3Qq4oJ2LP9qtDm_JNKNKtzgUzPlMy9xFhXwHXsA1mV8Pvg/formResponse',
-  entryDate: 'entry.295084129',
-  entryName: 'entry.774320166',
-  entryText: 'entry.1852794116',
-  entryTime: 'entry.1117304232',
-  entryCategory: 'entry.1406253915',
-  entryEmoji: 'entry.977247865',
+  apiUrl: 'REPLACE_WITH_APPS_SCRIPT_URL',
 };
 
-const TIME_RANKS = {
-  'toute la journée': -1,
-  'matin': 9,
-  'déjeuner': 12,
-  'après-midi': 14,
-  'soirée': 17,
-  'dîner': 19,
-};
-function getTimeRank(label){
-  const norm = (label || '').trim().toLowerCase();
-  if (norm in TIME_RANKS) return TIME_RANKS[norm];
-  const m = /(\d{1,2})/.exec(norm);
-  return m ? parseInt(m[1], 10) : 99;
+const CATEGORY_COLORS = ['cat-color-0', 'cat-color-1', 'cat-color-2', 'cat-color-3', 'cat-color-4'];
+function getCategoryColorClass(label){
+  const str = (label || '').trim().toLowerCase();
+  let hash = 0;
+  for (let i = 0; i < str.length; i++) hash = (hash * 31 + str.charCodeAt(i)) >>> 0;
+  return CATEGORY_COLORS[hash % CATEGORY_COLORS.length];
 }
-function isPresetCategory(label){
-  const norm = (label || '').trim().toLowerCase();
-  return norm === 'nourriture' || norm === 'activité' || norm === 'activite';
-}
-function getCategoryMeta(label){
-  const norm = (label || '').trim().toLowerCase();
-  if (norm === 'nourriture') return { icon: '🍣', cls: 'cat-food' };
-  if (norm === 'activité' || norm === 'activite') return { icon: '⛩️', cls: 'cat-activity' };
-  return { icon: '✏️', cls: 'cat-custom' };
+
+// Generic drag-to-reorder for a flat list of direct children with [data-id].
+// Follows the pointer with a floating clone; the real item silently reorders
+// in the background based on which sibling's midpoint it has crossed.
+function makeSortable(container, onReorder, onDragStateChange){
+  // Uses event delegation, so one listener handles children added later via
+  // innerHTML replacement too — guard against attaching more than once per
+  // persistent container (e.g. the day panel's entries list is reused across
+  // renders, unlike the week view's cells which are recreated each time).
+  if (container.dataset.sortableBound === 'true') return;
+  container.dataset.sortableBound = 'true';
+
+  let dragItem = null;
+  let ghost = null;
+  let pointerId = null;
+  let offsetX = 0, offsetY = 0;
+  let startOrderIds = [];
+
+  function getItems(){
+    return Array.from(container.children).filter(el => el.hasAttribute('data-id'));
+  }
+
+  function onPointerDown(e){
+    if (e.pointerType === 'mouse' && e.button !== 0) return;
+    const item = e.target.closest('[data-id]');
+    if (!item || item.parentElement !== container) return;
+
+    dragItem = item;
+    pointerId = e.pointerId;
+    startOrderIds = getItems().map(el => el.getAttribute('data-id'));
+
+    const rect = item.getBoundingClientRect();
+    offsetX = e.clientX - rect.left;
+    offsetY = e.clientY - rect.top;
+
+    ghost = item.cloneNode(true);
+    ghost.style.position = 'fixed';
+    ghost.style.left = rect.left + 'px';
+    ghost.style.top = rect.top + 'px';
+    ghost.style.width = rect.width + 'px';
+    ghost.style.margin = '0';
+    ghost.style.pointerEvents = 'none';
+    ghost.style.zIndex = '999';
+    ghost.style.opacity = '.95';
+    ghost.style.boxShadow = '0 10px 24px -6px rgba(0,0,0,.4)';
+    document.body.appendChild(ghost);
+
+    item.classList.add('dragging');
+    if (onDragStateChange) onDragStateChange(true);
+
+    try { item.setPointerCapture(pointerId); } catch (err) { /* no-op */ }
+    document.addEventListener('pointermove', onPointerMove);
+    document.addEventListener('pointerup', onPointerUp);
+    document.addEventListener('pointercancel', onPointerUp);
+  }
+
+  function onPointerMove(e){
+    if (!dragItem || !ghost) return;
+    ghost.style.left = (e.clientX - offsetX) + 'px';
+    ghost.style.top = (e.clientY - offsetY) + 'px';
+
+    const items = getItems().filter(el => el !== dragItem);
+    const pointerY = e.clientY;
+    let placed = false;
+    for (const sib of items) {
+      const rect = sib.getBoundingClientRect();
+      const mid = rect.top + rect.height / 2;
+      if (pointerY < mid) {
+        if (sib.previousElementSibling !== dragItem) container.insertBefore(dragItem, sib);
+        placed = true;
+        break;
+      }
+    }
+    if (!placed && container.lastElementChild !== dragItem) {
+      container.appendChild(dragItem);
+    }
+  }
+
+  function onPointerUp(){
+    if (!dragItem) return;
+    document.removeEventListener('pointermove', onPointerMove);
+    document.removeEventListener('pointerup', onPointerUp);
+    document.removeEventListener('pointercancel', onPointerUp);
+
+    dragItem.classList.remove('dragging');
+    if (ghost) { ghost.remove(); ghost = null; }
+
+    const newOrderIds = getItems().map(el => el.getAttribute('data-id'));
+    dragItem = null;
+
+    const changed = newOrderIds.some((id, i) => id !== startOrderIds[i]);
+    if (changed) onReorder(newOrderIds);
+
+    if (onDragStateChange) setTimeout(() => onDragStateChange(false), 50);
+  }
+
+  container.addEventListener('pointerdown', onPointerDown);
 }
 
 (function initDayPlanner(){
@@ -97,93 +171,12 @@ function getCategoryMeta(label){
   const resetBtn = document.getElementById('dayPanelReset');
   const form = document.getElementById('dayPanelForm');
   const nameInput = document.getElementById('dayPanelName');
-  const timeInput = document.getElementById('dayPanelTime');
   const categoryInput = document.getElementById('dayPanelCategory');
   const categoryEmojiInput = document.getElementById('dayPanelCategoryEmoji');
   const emojiPicker = document.getElementById('dayPanelEmojiPicker');
   const emojiTrigger = document.getElementById('dayPanelEmojiTrigger');
   const emojiGrid = document.getElementById('dayPanelEmojiGrid');
   const emojiPreview = document.getElementById('dayPanelEmojiPreview');
-
-  function resetEmojiPicker(){
-    categoryEmojiInput.value = '';
-    emojiPreview.textContent = '🙂';
-    emojiGrid.hidden = true;
-    emojiPicker.hidden = true;
-    emojiGrid.querySelectorAll('button.selected').forEach(b => b.classList.remove('selected'));
-  }
-
-  function setupOptionPicker({ container, trigger, menu, preview, customInput, hiddenInput, placeholder, onCustomToggle }){
-    trigger.addEventListener('click', () => { menu.hidden = !menu.hidden; });
-
-    menu.querySelectorAll('button[data-value]').forEach(btn => {
-      btn.addEventListener('click', () => {
-        const value = btn.getAttribute('data-value');
-        menu.querySelectorAll('button.selected').forEach(b => b.classList.remove('selected'));
-        btn.classList.add('selected');
-        menu.hidden = true;
-        if (value === '__custom__') {
-          hiddenInput.value = '';
-          preview.textContent = 'Personnalisé';
-          customInput.hidden = false;
-          customInput.value = '';
-          customInput.focus();
-          if (onCustomToggle) onCustomToggle(true);
-        } else {
-          customInput.hidden = true;
-          customInput.value = '';
-          hiddenInput.value = value;
-          preview.textContent = value;
-          if (onCustomToggle) onCustomToggle(false);
-        }
-      });
-    });
-
-    customInput.addEventListener('input', () => {
-      hiddenInput.value = customInput.value.trim();
-      preview.textContent = customInput.value.trim() || 'Personnalisé';
-    });
-
-    document.addEventListener('click', e => {
-      if (!menu.hidden && !container.contains(e.target)) menu.hidden = true;
-    });
-
-    return {
-      reset(){
-        hiddenInput.value = '';
-        preview.textContent = placeholder;
-        menu.hidden = true;
-        customInput.hidden = true;
-        customInput.value = '';
-        menu.querySelectorAll('button.selected').forEach(b => b.classList.remove('selected'));
-        if (onCustomToggle) onCustomToggle(false);
-      },
-    };
-  }
-
-  const timePicker = setupOptionPicker({
-    container: document.getElementById('dayPanelTimePicker'),
-    trigger: document.getElementById('dayPanelTimeTrigger'),
-    menu: document.getElementById('dayPanelTimeMenu'),
-    preview: document.getElementById('dayPanelTimePreview'),
-    customInput: document.getElementById('dayPanelTimeCustom'),
-    hiddenInput: timeInput,
-    placeholder: 'Choisir un moment',
-  });
-
-  const categoryPicker = setupOptionPicker({
-    container: document.getElementById('dayPanelCategoryPicker'),
-    trigger: document.getElementById('dayPanelCategoryTrigger'),
-    menu: document.getElementById('dayPanelCategoryMenu'),
-    preview: document.getElementById('dayPanelCategoryPreview'),
-    customInput: document.getElementById('dayPanelCategoryCustom'),
-    hiddenInput: categoryInput,
-    placeholder: 'Choisir une catégorie',
-    onCustomToggle: isCustom => {
-      emojiPicker.hidden = !isCustom;
-      if (!isCustom) resetEmojiPicker();
-    },
-  });
   const textInput = document.getElementById('dayPanelText');
   const formStatus = document.getElementById('dayPanelStatus');
   const dayButtons = document.querySelectorAll('.cal-day.highlight[data-date]');
@@ -194,6 +187,32 @@ function getCategoryMeta(label){
   const weekNextBtn = document.getElementById('weekNext');
   const TRIP_START = '2026-09-03';
   const TRIP_END = '2026-09-23';
+
+  let allEntries = [];
+  let currentDate = null;
+  let isDraggingEntry = false;
+
+  function resetEmojiPicker(){
+    categoryEmojiInput.value = '';
+    emojiPreview.textContent = '🙂';
+    emojiGrid.hidden = true;
+    emojiGrid.querySelectorAll('button.selected').forEach(b => b.classList.remove('selected'));
+  }
+
+  emojiTrigger.addEventListener('click', () => { emojiGrid.hidden = !emojiGrid.hidden; });
+  emojiGrid.querySelectorAll('button[data-emoji]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const emoji = btn.getAttribute('data-emoji');
+      categoryEmojiInput.value = emoji;
+      emojiPreview.textContent = emoji;
+      emojiGrid.querySelectorAll('button.selected').forEach(b => b.classList.remove('selected'));
+      btn.classList.add('selected');
+      emojiGrid.hidden = true;
+    });
+  });
+  document.addEventListener('click', e => {
+    if (!emojiGrid.hidden && !emojiPicker.contains(e.target)) emojiGrid.hidden = true;
+  });
 
   function toDateStr(date){
     return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
@@ -223,26 +242,14 @@ function getCategoryMeta(label){
     return 0;
   })();
 
-  let allEntries = [];
-  let currentDate = null;
-
   function isConfigured(){
-    return Object.values(DAY_PLANNER_CONFIG).every(v => v && !v.startsWith('REPLACE'));
+    return DAY_PLANNER_CONFIG.apiUrl && !DAY_PLANNER_CONFIG.apiUrl.startsWith('REPLACE');
   }
 
   function escapeHtml(str){
     const div = document.createElement('div');
     div.textContent = str || '';
     return div.innerHTML;
-  }
-
-  function normalizeSheetDate(raw){
-    if (raw == null) return '';
-    if (typeof raw === 'string' && raw.startsWith('Date(')) {
-      const p = raw.slice(5, -1).split(',').map(Number);
-      return `${p[0]}-${String(p[1] + 1).padStart(2, '0')}-${String(p[2]).padStart(2, '0')}`;
-    }
-    return String(raw).trim();
   }
 
   function updateBadges(){
@@ -256,29 +263,29 @@ function getCategoryMeta(label){
   }
 
   function fetchAllEntries(){
-    if (!isConfigured()) return;
-    const url = `https://docs.google.com/spreadsheets/d/${DAY_PLANNER_CONFIG.sheetId}/gviz/tq?tqx=out:json&gid=0&_=${Date.now()}`;
-    return fetch(url)
-      .then(res => res.text())
-      .then(text => {
-        const jsonStr = text.substring(text.indexOf('(') + 1, text.lastIndexOf(')'));
-        const data = JSON.parse(jsonStr);
-        const rows = (data.table && data.table.rows) || [];
-        allEntries = rows.map(row => {
-          const c = row.c || [];
-          return {
-            date: normalizeSheetDate(c[1] && c[1].v),
-            name: (c[2] && c[2].v) || '',
-            text: (c[3] && c[3].v) || '',
-            time: (c[4] && c[4].v) || '',
-            category: (c[5] && c[5].v) || '',
-            emoji: (c[6] && c[6].v) || '',
-          };
-        }).filter(item => item.date && item.text);
+    if (!isConfigured()) return Promise.resolve();
+    return fetch(`${DAY_PLANNER_CONFIG.apiUrl}?_=${Date.now()}`)
+      .then(res => res.json())
+      .then(data => {
+        allEntries = (data.entries || []).slice().sort((a, b) => (Number(a.order) || 0) - (Number(b.order) || 0));
         updateBadges();
         renderWeekView();
       })
       .catch(() => {});
+  }
+
+  function reorderDay(dateStr, orderedIds){
+    // Optimistic local update first, so the UI feels instant.
+    orderedIds.forEach((id, index) => {
+      const entry = allEntries.find(e => e.id === id);
+      if (entry) entry.order = index;
+    });
+    updateBadges();
+    if (!isConfigured()) return;
+    fetch(DAY_PLANNER_CONFIG.apiUrl, {
+      method: 'POST',
+      body: JSON.stringify({ action: 'reorder', date: dateStr, orderedIds }),
+    }).catch(() => {});
   }
 
   function renderWeekView(){
@@ -293,29 +300,31 @@ function getCategoryMeta(label){
       const dateStr = toDateStr(dt);
       const inTrip = dateStr >= TRIP_START && dateStr <= TRIP_END;
       const label = dt.toLocaleDateString('fr-FR', { weekday: 'short', day: 'numeric' });
-      const items = allEntries
-        .filter(item => item.date === dateStr)
-        .slice()
-        .sort((a, b) => getTimeRank(a.time) - getTimeRank(b.time));
+      const items = allEntries.filter(item => item.date === dateStr);
 
       const body = !inTrip
         ? ''
         : items.length
-          ? items.map(item => {
-              const cat = getCategoryMeta(item.category);
-              const icon = item.emoji || cat.icon;
-              return `<div class="week-entry ${cat.cls}">${icon} ${escapeHtml(item.text)}</div>`;
-            }).join('')
+          ? items.map(item => `<div class="week-entry ${getCategoryColorClass(item.category)}" data-id="${item.id}">${item.emoji || '🏷️'} ${escapeHtml(item.text)}</div>`).join('')
           : '<p class="week-day-empty">—</p>';
 
       return `<div class="week-day${inTrip ? ' clickable' : ' muted'}" ${inTrip ? `data-date="${dateStr}"` : ''}>
         <div class="week-day-label">${label}</div>
-        ${body}
+        <div class="week-day-entries">${body}</div>
       </div>`;
     }).join('');
 
+    weekGrid.querySelectorAll('.week-day-entries').forEach(list => {
+      const cell = list.closest('.week-day');
+      const dateStr = cell.getAttribute('data-date');
+      if (dateStr) {
+        makeSortable(list, orderedIds => reorderDay(dateStr, orderedIds), dragging => { isDraggingEntry = dragging; });
+      }
+    });
+
     if (weekGrid.dataset.bound !== 'true') {
       weekGrid.addEventListener('click', e => {
+        if (isDraggingEntry) return;
         const cell = e.target.closest('.week-day.clickable');
         if (!cell) return;
         const btn = document.querySelector(`.cal-day.highlight[data-date="${cell.getAttribute('data-date')}"]`);
@@ -335,27 +344,20 @@ function getCategoryMeta(label){
   }
 
   function renderEntriesFor(dateStr){
-    const items = allEntries
-      .filter(item => item.date === dateStr)
-      .slice()
-      .sort((a, b) => getTimeRank(a.time) - getTimeRank(b.time));
+    const items = allEntries.filter(item => item.date === dateStr);
     if (!items.length) {
       entriesEl.innerHTML = '<p class="day-panel-status">Rien de prévu pour l\'instant. Soyez le premier !</p>';
       updateScrollFade();
       return;
     }
-    entriesEl.innerHTML = items.map(item => {
-      const cat = getCategoryMeta(item.category);
-      const icon = item.emoji || cat.icon;
-      return `<div class="day-entry ${cat.cls}">
+    entriesEl.innerHTML = items.map(item => `<div class="day-entry ${getCategoryColorClass(item.category)}" data-id="${item.id}">
         <div class="day-entry-meta">
-          ${item.time ? `<span class="day-entry-time">🕐 ${escapeHtml(item.time)}</span>` : ''}
-          ${item.category ? `<span class="day-entry-category">${icon} ${escapeHtml(item.category)}</span>` : ''}
+          <span class="day-entry-category">${item.emoji || '🏷️'} ${escapeHtml(item.category)}</span>
         </div>
         <p><span class="day-entry-name">${escapeHtml(item.name)} :</span>${escapeHtml(item.text)}</p>
-      </div>`;
-    }).join('');
+      </div>`).join('');
     updateScrollFade();
+    makeSortable(entriesEl, orderedIds => reorderDay(dateStr, orderedIds), dragging => { isDraggingEntry = dragging; });
   }
 
   function selectDay(dateStr, btn){
@@ -366,8 +368,8 @@ function getCategoryMeta(label){
     titleEl.textContent = label.charAt(0).toUpperCase() + label.slice(1);
     const savedName = localStorage.getItem('familyName');
     if (savedName) nameInput.value = savedName;
-    timePicker.reset();
-    categoryPicker.reset();
+    categoryInput.value = '';
+    resetEmojiPicker();
     textInput.value = '';
     formStatus.textContent = '';
 
@@ -394,23 +396,6 @@ function getCategoryMeta(label){
   });
   resetBtn.addEventListener('click', resetPanel);
 
-  emojiTrigger.addEventListener('click', () => {
-    emojiGrid.hidden = !emojiGrid.hidden;
-  });
-  emojiGrid.querySelectorAll('button[data-emoji]').forEach(btn => {
-    btn.addEventListener('click', () => {
-      const emoji = btn.getAttribute('data-emoji');
-      categoryEmojiInput.value = emoji;
-      emojiPreview.textContent = emoji;
-      emojiGrid.querySelectorAll('button.selected').forEach(b => b.classList.remove('selected'));
-      btn.classList.add('selected');
-      emojiGrid.hidden = true;
-    });
-  });
-  document.addEventListener('click', e => {
-    if (!emojiPicker.hidden && !emojiPicker.contains(e.target)) emojiGrid.hidden = true;
-  });
-
   if (weekPrevBtn && weekNextBtn) {
     weekPrevBtn.addEventListener('click', () => { currentWeekIndex--; renderWeekView(); });
     weekNextBtn.addEventListener('click', () => { currentWeekIndex++; renderWeekView(); });
@@ -424,45 +409,41 @@ function getCategoryMeta(label){
       return;
     }
     const name = nameInput.value.trim();
-    const time = timeInput.value.trim();
     const category = categoryInput.value.trim();
-    const emoji = emojiPicker.hidden ? '' : categoryEmojiInput.value.trim();
+    const emoji = categoryEmojiInput.value.trim();
     const text = textInput.value.trim();
     if (!name) { formStatus.textContent = 'Merci de renseigner votre prénom.'; return; }
-    if (!time) { formStatus.textContent = 'Merci de choisir un moment.'; return; }
     if (!category) { formStatus.textContent = 'Merci de choisir une catégorie.'; return; }
+    if (!emoji) { formStatus.textContent = 'Choisissez un émoji pour cette catégorie.'; return; }
     if (!text) { formStatus.textContent = 'Merci de décrire votre idée.'; return; }
-    if (!isPresetCategory(category) && !emoji) {
-      formStatus.textContent = 'Choisissez un émoji pour votre catégorie personnalisée.';
-      return;
-    }
     localStorage.setItem('familyName', name);
 
     const submitBtn = form.querySelector('button');
     submitBtn.disabled = true;
     formStatus.textContent = 'Envoi...';
 
-    const body = new FormData();
-    body.append(DAY_PLANNER_CONFIG.entryDate, currentDate);
-    body.append(DAY_PLANNER_CONFIG.entryName, name);
-    body.append(DAY_PLANNER_CONFIG.entryText, text);
-    body.append(DAY_PLANNER_CONFIG.entryTime, time);
-    body.append(DAY_PLANNER_CONFIG.entryCategory, category);
-    body.append(DAY_PLANNER_CONFIG.entryEmoji, emoji);
-
-    fetch(DAY_PLANNER_CONFIG.formAction, { method: 'POST', mode: 'no-cors', body })
-      .catch(() => {})
-      .finally(() => {
-        allEntries.push({ date: currentDate, name, text, time, category, emoji });
+    fetch(DAY_PLANNER_CONFIG.apiUrl, {
+      method: 'POST',
+      body: JSON.stringify({ action: 'add', date: currentDate, name, category, emoji, text }),
+    })
+      .then(res => res.json())
+      .then(result => {
+        if (!result || !result.success) throw new Error('add failed');
+        allEntries.push({ id: result.id, date: currentDate, name, category, emoji, text, order: result.order });
         updateBadges();
         renderEntriesFor(currentDate);
         renderWeekView();
         textInput.value = '';
-        timePicker.reset();
-        categoryPicker.reset();
+        categoryInput.value = '';
+        resetEmojiPicker();
         formStatus.textContent = 'Ajouté !';
-        submitBtn.disabled = false;
         setTimeout(() => { formStatus.textContent = ''; }, 2000);
+      })
+      .catch(() => {
+        formStatus.textContent = "Erreur lors de l'envoi, réessayez.";
+      })
+      .finally(() => {
+        submitBtn.disabled = false;
       });
   });
 

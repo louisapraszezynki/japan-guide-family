@@ -8,7 +8,7 @@
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⛩️</text></svg>">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;700&family=Zen+Maru+Gothic:wght@400;500;700&display=swap">
-<link rel="stylesheet" href="style.css?v=31">
+<link rel="stylesheet" href="style.css?v=32">
 </head>
 <body>
 
@@ -118,38 +118,8 @@
             </div>
             <form class="day-panel-form" id="dayPanelForm">
               <input type="text" id="dayPanelName" placeholder="Votre prénom" autocomplete="name" required>
-              <div class="day-panel-form-row">
-                <div class="option-picker" id="dayPanelTimePicker">
-                  <button type="button" class="option-picker-trigger" id="dayPanelTimeTrigger" aria-haspopup="true">
-                    <span id="dayPanelTimePreview">Choisir un moment</span>
-                  </button>
-                  <div class="option-picker-menu" id="dayPanelTimeMenu" hidden>
-                    <button type="button" data-value="Matin">Matin</button>
-                    <button type="button" data-value="Déjeuner">Déjeuner</button>
-                    <button type="button" data-value="Après-midi">Après-midi</button>
-                    <button type="button" data-value="Soirée">Soirée</button>
-                    <button type="button" data-value="Dîner">Dîner</button>
-                    <button type="button" data-value="Toute la journée">Toute la journée</button>
-                    <button type="button" data-value="__custom__">Personnalisé...</button>
-                  </div>
-                  <input type="text" id="dayPanelTimeCustom" placeholder="Précisez le moment" hidden>
-                  <input type="hidden" id="dayPanelTime">
-                </div>
-
-                <div class="option-picker" id="dayPanelCategoryPicker">
-                  <button type="button" class="option-picker-trigger" id="dayPanelCategoryTrigger" aria-haspopup="true">
-                    <span id="dayPanelCategoryPreview">Choisir une catégorie</span>
-                  </button>
-                  <div class="option-picker-menu" id="dayPanelCategoryMenu" hidden>
-                    <button type="button" data-value="Nourriture">🍣 Nourriture</button>
-                    <button type="button" data-value="Activité">⛩️ Activité</button>
-                    <button type="button" data-value="__custom__">Personnalisé...</button>
-                  </div>
-                  <input type="text" id="dayPanelCategoryCustom" placeholder="Précisez la catégorie" hidden>
-                  <input type="hidden" id="dayPanelCategory">
-                </div>
-              </div>
-              <div class="emoji-picker" id="dayPanelEmojiPicker" hidden>
+              <input type="text" id="dayPanelCategory" placeholder="Catégorie (ex: Shopping, Restaurant...)" required>
+              <div class="emoji-picker" id="dayPanelEmojiPicker">
                 <button type="button" class="emoji-picker-trigger" id="dayPanelEmojiTrigger" aria-haspopup="true">
                   <span id="dayPanelEmojiPreview">🙂</span> Choisir un émoji pour cette catégorie
                 </button>
@@ -545,6 +515,6 @@
 
 </main>
 
-<script src="script.js?v=15"></script>
+<script src="script.js?v=16"></script>
 </body>
 </html>

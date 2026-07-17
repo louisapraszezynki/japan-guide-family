@@ -62,12 +62,12 @@ const DAY_PLANNER_CONFIG = {
 };
 
 const TIME_RANKS = {
-  'toute la journée (9h-19h)': -1,
-  'matin (9h-12h)': 9,
-  'déjeuner (12h)': 12,
-  'après-midi (14h-16h)': 14,
-  'soirée (17h-20h)': 17,
-  'dîner (19h)': 19,
+  'toute la journée': -1,
+  'matin': 9,
+  'déjeuner': 12,
+  'après-midi': 14,
+  'soirée': 17,
+  'dîner': 19,
 };
 function getTimeRank(label){
   const norm = (label || '').trim().toLowerCase();
@@ -77,7 +77,7 @@ function getTimeRank(label){
 }
 function getCategoryMeta(label){
   const norm = (label || '').trim().toLowerCase();
-  if (norm === 'nourriture') return { icon: '🍜', cls: 'cat-food' };
+  if (norm === 'nourriture') return { icon: '🍣', cls: 'cat-food' };
   if (norm === 'activité' || norm === 'activite') return { icon: '⛩️', cls: 'cat-activity' };
   return { icon: '✏️', cls: 'cat-custom' };
 }

@@ -16,7 +16,8 @@
 
 <nav class="dot-nav" id="dotNav" aria-label="Navigation du guide">
   <a href="#hero" class="dot active" data-label="Accueil"><span></span></a>
-  <a href="#introduction" class="dot" data-label="Quand et où"><span></span></a>
+  <a href="#planning" class="dot" data-label="Planning"><span></span></a>
+  <a href="#geographie" class="dot" data-label="Géographie"><span></span></a>
   <a href="#culture" class="dot" data-label="Culture"><span></span></a>
   <a href="#climat" class="dot" data-label="Climat"><span></span></a>
   <a href="#administratif" class="dot" data-label="Administratif"><span></span></a>
@@ -33,7 +34,7 @@
       <p class="kicker">プラゼザンキ家の日本旅行</p>
       <h1>Un guide pour de<br><span class="accent">supers vacances</span><br>au Japon</h1>
       <p class="hero-sub">Bienvenue dans ce guide de préparation pour votre voyage au Japon !</p>
-      <a href="#introduction" class="scroll-cue">
+      <a href="#planning" class="scroll-cue">
         <span>Commencer la lecture</span>
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M12 4v16m0 0l-6-6m6 6l6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
       </a>
@@ -44,11 +45,11 @@
     </div>
   </section>
 
-  <!-- INTRODUCTION -->
-  <section id="introduction" class="section">
+  <!-- PLANNING -->
+  <section id="planning" class="section">
     <div class="section-head reveal">
       <span class="section-num">00</span>
-      <h2>Quand et où</h2>
+      <h2>Planning</h2>
     </div>
 
     <div class="card-grid">
@@ -119,12 +120,12 @@
                 <input type="text" id="dayPanelCategory" list="dayPanelCategoryOptions" placeholder="Catégorie (nourriture...)" required>
               </div>
               <datalist id="dayPanelTimeOptions">
-                <option value="Matin (9h-12h)"></option>
-                <option value="Déjeuner (12h)"></option>
-                <option value="Après-midi (14h-16h)"></option>
-                <option value="Soirée (17h-20h)"></option>
-                <option value="Dîner (19h)"></option>
-                <option value="Toute la journée (9h-19h)"></option>
+                <option value="Matin"></option>
+                <option value="Déjeuner"></option>
+                <option value="Après-midi"></option>
+                <option value="Soirée"></option>
+                <option value="Dîner"></option>
+                <option value="Toute la journée"></option>
               </datalist>
               <datalist id="dayPanelCategoryOptions">
                 <option value="Nourriture"></option>
@@ -140,7 +141,7 @@
 
       <div class="card wide reveal">
         <div class="week-view-header">
-          <h3>📅 Vue de la semaine</h3>
+          <h3>📅 Vue par semaine</h3>
           <div class="week-nav">
             <button type="button" id="weekPrev" aria-label="Semaine précédente">‹</button>
             <span id="weekLabel"></span>
@@ -149,7 +150,18 @@
         </div>
         <div class="week-grid" id="weekGrid"></div>
       </div>
+    </div>
+  </section>
 
+  <!-- GÉOGRAPHIE -->
+  <section id="geographie" class="section alt">
+    <div class="section-head reveal">
+      <span class="section-num">01</span>
+      <h2>Géographie</h2>
+      <p class="section-intro">Où nous sommes, et comment nous rejoindre.</p>
+    </div>
+
+    <div class="card-grid">
       <div class="card wide reveal">
         <h3>🏠 Notre maison</h3>
         <p>Yonezawa se trouve dans la préfecture de Yamagata, à quelques heures de Shinkansen au nord de Tokyo.</p>
@@ -163,9 +175,9 @@
   </section>
 
   <!-- CULTURE -->
-  <section id="culture" class="section alt">
+  <section id="culture" class="section">
     <div class="section-head reveal">
-      <span class="section-num">01</span>
+      <span class="section-num">02</span>
       <h2>Culture</h2>
       <p class="section-intro">Quelques explications sur les codes de la culture japonaise pour se mettre dans l'ambiance avant de venir et en profiter sereinement sur place.</p>
     </div>
@@ -287,9 +299,9 @@
   </section>
 
   <!-- CLIMAT -->
-  <section id="climat" class="section">
+  <section id="climat" class="section alt">
     <div class="section-head reveal">
-      <span class="section-num">02</span>
+      <span class="section-num">03</span>
       <h2>Le climat</h2>
       <p class="section-intro">À quoi s'attendre côté météo et quoi emmener dans votre valise.</p>
     </div>
@@ -348,9 +360,9 @@
   </section>
 
   <!-- ADMINISTRATIF -->
-  <section id="administratif" class="section alt">
+  <section id="administratif" class="section">
     <div class="section-head reveal">
-      <span class="section-num">03</span>
+      <span class="section-num">04</span>
       <h2>Administratif</h2>
       <p class="section-intro">Les démarches à faire avant le départ.</p>
     </div>
@@ -391,9 +403,9 @@
   </section>
 
   <!-- TRANSPORTS -->
-  <section id="transports" class="section">
+  <section id="transports" class="section alt">
     <div class="section-head reveal">
-      <span class="section-num">04</span>
+      <span class="section-num">05</span>
       <h2>Les transports</h2>
       <p class="section-intro">Shinkansen, métro, voiture : comment se déplacer une fois sur place.</p>
     </div>
@@ -439,9 +451,9 @@
   </section>
 
   <!-- INFOS UTILES -->
-  <section id="infos-utiles" class="section alt">
+  <section id="infos-utiles" class="section">
     <div class="section-head reveal">
-      <span class="section-num">05</span>
+      <span class="section-num">06</span>
       <h2>Infos utiles pour vos démarches</h2>
       <p class="section-intro">À garder sous la main (en photo sur votre téléphone).</p>
     </div>
@@ -483,6 +495,6 @@
 
 </main>
 
-<script src="script.js?v=9"></script>
+<script src="script.js?v=10"></script>
 </body>
 </html>

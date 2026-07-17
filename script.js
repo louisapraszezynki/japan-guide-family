@@ -78,7 +78,7 @@ function getTimeRank(label){
 function getCategoryMeta(label){
   const norm = (label || '').trim().toLowerCase();
   if (norm === 'nourriture') return { icon: '🍜', cls: 'cat-food' };
-  if (norm === 'activité' || norm === 'activite') return { icon: '🎌', cls: 'cat-activity' };
+  if (norm === 'activité' || norm === 'activite') return { icon: '⛩️', cls: 'cat-activity' };
   return { icon: '✏️', cls: 'cat-custom' };
 }
 
@@ -97,6 +97,41 @@ function getCategoryMeta(label){
   const textInput = document.getElementById('dayPanelText');
   const formStatus = document.getElementById('dayPanelStatus');
   const dayButtons = document.querySelectorAll('.cal-day.highlight[data-date]');
+
+  const weekGrid = document.getElementById('weekGrid');
+  const weekLabel = document.getElementById('weekLabel');
+  const weekPrevBtn = document.getElementById('weekPrev');
+  const weekNextBtn = document.getElementById('weekNext');
+  const TRIP_START = '2026-09-03';
+  const TRIP_END = '2026-09-23';
+
+  function toDateStr(date){
+    return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+  }
+
+  const weeks = (function buildWeeks(){
+    const result = [];
+    const cursor = new Date('2026-08-31T00:00:00'); // Monday of the first week
+    for (let w = 0; w < 4; w++) {
+      const days = [];
+      for (let d = 0; d < 7; d++) {
+        const dt = new Date(cursor);
+        dt.setDate(cursor.getDate() + w * 7 + d);
+        days.push(dt);
+      }
+      result.push(days);
+    }
+    return result;
+  })();
+  let currentWeekIndex = (function findDefaultWeek(){
+    const todayStr = toDateStr(new Date());
+    for (let i = 0; i < weeks.length; i++) {
+      const first = toDateStr(weeks[i][0]);
+      const last = toDateStr(weeks[i][6]);
+      if (todayStr >= first && todayStr <= last) return i;
+    }
+    return 0;
+  })();
 
   let allEntries = [];
   let currentDate = null;
@@ -150,8 +185,55 @@ function getCategoryMeta(label){
           };
         }).filter(item => item.date && item.text);
         updateBadges();
+        renderWeekView();
       })
       .catch(() => {});
+  }
+
+  function renderWeekView(){
+    if (!weekGrid) return;
+    const days = weeks[currentWeekIndex];
+    const first = days[0], last = days[6];
+    weekLabel.textContent = `${first.getDate()} ${first.toLocaleDateString('fr-FR', { month: 'short' })} – ${last.getDate()} ${last.toLocaleDateString('fr-FR', { month: 'short' })}`;
+    weekPrevBtn.disabled = currentWeekIndex === 0;
+    weekNextBtn.disabled = currentWeekIndex === weeks.length - 1;
+
+    weekGrid.innerHTML = days.map(dt => {
+      const dateStr = toDateStr(dt);
+      const inTrip = dateStr >= TRIP_START && dateStr <= TRIP_END;
+      const label = dt.toLocaleDateString('fr-FR', { weekday: 'short', day: 'numeric' });
+      const items = allEntries
+        .filter(item => item.date === dateStr)
+        .slice()
+        .sort((a, b) => getTimeRank(a.time) - getTimeRank(b.time));
+
+      const body = !inTrip
+        ? ''
+        : items.length
+          ? items.map(item => {
+              const cat = getCategoryMeta(item.category);
+              return `<div class="week-entry ${cat.cls}">${cat.icon} ${escapeHtml(item.text)}</div>`;
+            }).join('')
+          : '<p class="week-day-empty">—</p>';
+
+      return `<div class="week-day${inTrip ? ' clickable' : ' muted'}" ${inTrip ? `data-date="${dateStr}"` : ''}>
+        <div class="week-day-label">${label}</div>
+        ${body}
+      </div>`;
+    }).join('');
+
+    if (weekGrid.dataset.bound !== 'true') {
+      weekGrid.addEventListener('click', e => {
+        const cell = e.target.closest('.week-day.clickable');
+        if (!cell) return;
+        const btn = document.querySelector(`.cal-day.highlight[data-date="${cell.getAttribute('data-date')}"]`);
+        if (btn) {
+          selectDay(cell.getAttribute('data-date'), btn);
+          document.getElementById('dayPanel').scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+      });
+      weekGrid.dataset.bound = 'true';
+    }
   }
 
   function renderEntriesFor(dateStr){
@@ -208,6 +290,12 @@ function getCategoryMeta(label){
   });
   resetBtn.addEventListener('click', resetPanel);
 
+  if (weekPrevBtn && weekNextBtn) {
+    weekPrevBtn.addEventListener('click', () => { currentWeekIndex--; renderWeekView(); });
+    weekNextBtn.addEventListener('click', () => { currentWeekIndex++; renderWeekView(); });
+    renderWeekView();
+  }
+
   form.addEventListener('submit', e => {
     e.preventDefault();
     if (!isConfigured() || !currentDate) {
@@ -238,6 +326,7 @@ function getCategoryMeta(label){
         allEntries.push({ date: currentDate, name, text, time, category });
         updateBadges();
         renderEntriesFor(currentDate);
+        renderWeekView();
         textInput.value = '';
         formStatus.textContent = 'Ajouté !';
         submitBtn.disabled = false;

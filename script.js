@@ -52,7 +52,7 @@ revealEls.forEach(el => revealObserver.observe(el));
 // ---------- Day planner (shared via a Google Apps Script Web App) ----------
 // Fill this in once the Apps Script is deployed (see README.md).
 const DAY_PLANNER_CONFIG = {
-  apiUrl: 'REPLACE_WITH_APPS_SCRIPT_URL',
+  apiUrl: 'https://script.google.com/macros/s/AKfycbzgyAxDzk9eWccFeRXVs1xcjM8AYfo3RNWl5SqmfNOpMk77VY0cg-ZRfeg5GiRnN-dR/exec',
 };
 
 const CATEGORY_COLORS = ['cat-color-0', 'cat-color-1', 'cat-color-2', 'cat-color-3', 'cat-color-4'];

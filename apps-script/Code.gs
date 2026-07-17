@@ -15,11 +15,28 @@ function getSheet_() {
     sheet = ss.insertSheet(SHEET_NAME);
     sheet.appendRow(HEADERS);
   }
+  // Force the Date column to plain text so Sheets never auto-converts
+  // "2026-09-03" into an actual Date value on write (which would silently
+  // shift by the sheet's timezone and break every date comparison).
+  sheet.getRange('B:B').setNumberFormat('@');
   return sheet;
 }
 
 function jsonResponse_(obj) {
   return ContentService.createTextOutput(JSON.stringify(obj)).setMimeType(ContentService.MimeType.JSON);
+}
+
+// Defensive: normalizes a cell value back to "YYYY-MM-DD" even if it was
+// already auto-converted to a real Date (e.g. rows written before the
+// plain-text fix above, or someone editing the sheet by hand).
+function normalizeDate_(val) {
+  if (val instanceof Date) {
+    const y = val.getFullYear();
+    const m = String(val.getMonth() + 1).padStart(2, '0');
+    const d = String(val.getDate()).padStart(2, '0');
+    return `${y}-${m}-${d}`;
+  }
+  return val;
 }
 
 function doGet(e) {
@@ -29,7 +46,7 @@ function doGet(e) {
   const entries = rows
     .map(r => ({
       id: r[0],
-      date: r[1],
+      date: normalizeDate_(r[1]),
       name: r[2],
       category: r[3],
       emoji: r[4],
@@ -54,7 +71,7 @@ function doPost(e) {
     const id = Utilities.getUuid();
     const now = new Date();
     const data = sheet.getDataRange().getValues();
-    const sameDay = data.slice(1).filter(r => r[1] === body.date);
+    const sameDay = data.slice(1).filter(r => normalizeDate_(r[1]) === body.date);
     const maxOrder = sameDay.length ? Math.max.apply(null, sameDay.map(r => Number(r[6]) || 0)) : -1;
     const order = maxOrder + 1;
     sheet.appendRow([id, body.date, body.name, body.category, body.emoji, body.text, order, now]);

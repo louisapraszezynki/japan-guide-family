@@ -309,6 +309,15 @@ a{color:var(--vermillion);}
 }
 .phrase-table th{color:var(--ink-soft); font-weight:600;}
 .phrase-table td em{color:var(--ink-soft); font-style:italic;}
+.speak-btn{
+  display:inline-flex; align-items:center; justify-content:center;
+  width:24px; height:24px; margin-left:4px; padding:0;
+  border:none; border-radius:50%; background:var(--paper-alt);
+  font-size:.85rem; line-height:1; cursor:pointer; vertical-align:middle;
+}
+.section.alt .speak-btn{background:var(--paper);}
+.speak-btn:hover{background:var(--vermillion-soft); color:#fff;}
+.speak-btn.speaking{background:var(--vermillion); color:#fff;}
 @media (max-width: 500px){
   .phrase-table{font-size:.82rem;}
   .phrase-table th, .phrase-table td{padding:6px 8px;}

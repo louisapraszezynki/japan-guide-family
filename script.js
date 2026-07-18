@@ -49,6 +49,30 @@ document.querySelectorAll('.image-placeholder[data-slot]').forEach(el => {
   mapEl.addEventListener('click', () => map.scrollWheelZoom.enable());
 })();
 
+// Speak Japanese phrases aloud (Web Speech API)
+(function initSpeakButtons(){
+  const buttons = document.querySelectorAll('.speak-btn');
+  if (!buttons.length) return;
+  if (!('speechSynthesis' in window)) {
+    buttons.forEach(btn => { btn.disabled = true; btn.title = 'Lecture vocale non disponible sur ce navigateur'; });
+    return;
+  }
+  buttons.forEach(btn => {
+    btn.addEventListener('click', () => {
+      const text = btn.getAttribute('data-jp');
+      window.speechSynthesis.cancel();
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.lang = 'ja-JP';
+      utterance.rate = 0.85;
+      buttons.forEach(b => b.classList.remove('speaking'));
+      btn.classList.add('speaking');
+      utterance.onend = () => btn.classList.remove('speaking');
+      utterance.onerror = () => btn.classList.remove('speaking');
+      window.speechSynthesis.speak(utterance);
+    });
+  });
+})();
+
 // Countdown to the trip
 const countdownEl = document.getElementById('countdown');
 if (countdownEl) {

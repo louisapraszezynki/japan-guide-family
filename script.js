@@ -10,6 +10,45 @@ document.querySelectorAll('.image-placeholder[data-slot]').forEach(el => {
   img.src = src;
 });
 
+// Interactive Japan map (Leaflet + OpenStreetMap), pinned on Yonezawa,
+// Tokyo and Mont Fuji. Wheel-zoom starts off so the map doesn't hijack
+// page scrolling; it turns on once the user actually clicks into it.
+(function initJapanMap(){
+  const mapEl = document.getElementById('japanMap');
+  if (!mapEl || !window.L) return;
+
+  const map = L.map(mapEl, { scrollWheelZoom: false, minZoom: 5, maxZoom: 12 });
+
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+    maxZoom: 18,
+  }).addTo(map);
+
+  function pinIcon(emoji, colorClass){
+    return L.divIcon({
+      html: `<div class="map-pin ${colorClass}">${emoji}</div>`,
+      className: '',
+      iconSize: [34, 34],
+      iconAnchor: [17, 17],
+      popupAnchor: [0, -17],
+    });
+  }
+
+  const points = [
+    { lat: 37.9227, lng: 140.1197, emoji: '🏠', color: 'map-pin-home', label: '🏠 Yonezawa — chez nous !' },
+    { lat: 35.6812, lng: 139.7671, emoji: '🗼', color: 'map-pin-tokyo', label: '🗼 Tokyo' },
+    { lat: 35.3606, lng: 138.7274, emoji: '🗻', color: 'map-pin-fuji', label: '🗻 Mont Fuji' },
+  ];
+
+  points.forEach(p => {
+    L.marker([p.lat, p.lng], { icon: pinIcon(p.emoji, p.color) }).addTo(map).bindPopup(p.label);
+  });
+
+  map.fitBounds(L.latLngBounds(points.map(p => [p.lat, p.lng])), { padding: [30, 30] });
+
+  mapEl.addEventListener('click', () => map.scrollWheelZoom.enable());
+})();
+
 // Countdown to the trip
 const countdownEl = document.getElementById('countdown');
 if (countdownEl) {

@@ -161,6 +161,140 @@ function makeSortable(container, onReorder, onDragStateChange){
   container.addEventListener('pointerdown', onPointerDown);
 }
 
+// Drag-to-reorder-or-move across several containers at once (the week
+// view's day cells): dragging within one cell reorders it, dragging into a
+// different cell moves the entry to that day. Containers are expected to be
+// freshly created each call (the week view is rebuilt from scratch on every
+// render), so no idempotency guard is needed here unlike makeSortable.
+function makeCrossDaySortable(containers, onReorder, onMove, onDragStateChange){
+  const containerList = Array.from(containers);
+  let dragItem = null;
+  let ghost = null;
+  let pointerId = null;
+  let offsetX = 0, offsetY = 0;
+  let originContainer = null;
+  let currentContainer = null;
+
+  function getItems(container){
+    return Array.from(container.children).filter(el => el.hasAttribute('data-id'));
+  }
+
+  function containerAt(x, y){
+    for (const c of containerList) {
+      const rect = c.getBoundingClientRect();
+      if (x >= rect.left && x <= rect.right && y >= rect.top && y <= rect.bottom) return c;
+    }
+    return null;
+  }
+
+  function refreshEmptyState(container){
+    const placeholder = container.querySelector('.week-day-empty');
+    if (getItems(container).length === 0) {
+      if (!placeholder) container.innerHTML = '<p class="week-day-empty">—</p>';
+    } else if (placeholder) {
+      placeholder.remove();
+    }
+  }
+
+  function onPointerDown(e){
+    if (e.pointerType === 'mouse' && e.button !== 0) return;
+    const item = e.target.closest('[data-id]');
+    if (!item || !containerList.includes(item.parentElement)) return;
+
+    dragItem = item;
+    originContainer = item.parentElement;
+    currentContainer = originContainer;
+    pointerId = e.pointerId;
+
+    const rect = item.getBoundingClientRect();
+    offsetX = e.clientX - rect.left;
+    offsetY = e.clientY - rect.top;
+
+    ghost = item.cloneNode(true);
+    ghost.style.position = 'fixed';
+    ghost.style.left = rect.left + 'px';
+    ghost.style.top = rect.top + 'px';
+    ghost.style.width = rect.width + 'px';
+    ghost.style.margin = '0';
+    ghost.style.pointerEvents = 'none';
+    ghost.style.zIndex = '999';
+    ghost.style.opacity = '.95';
+    ghost.style.boxShadow = '0 10px 24px -6px rgba(0,0,0,.4)';
+    document.body.appendChild(ghost);
+
+    item.classList.add('dragging');
+    if (onDragStateChange) onDragStateChange(true);
+
+    try { item.setPointerCapture(pointerId); } catch (err) { /* no-op */ }
+    document.addEventListener('pointermove', onPointerMove);
+    document.addEventListener('pointerup', onPointerUp);
+    document.addEventListener('pointercancel', onPointerUp);
+  }
+
+  function onPointerMove(e){
+    if (!dragItem) return;
+    ghost.style.left = (e.clientX - offsetX) + 'px';
+    ghost.style.top = (e.clientY - offsetY) + 'px';
+
+    const hoverContainer = containerAt(e.clientX, e.clientY);
+    if (hoverContainer && hoverContainer !== currentContainer) {
+      const placeholder = hoverContainer.querySelector('.week-day-empty');
+      if (placeholder) placeholder.remove();
+      hoverContainer.appendChild(dragItem);
+      currentContainer = hoverContainer;
+    }
+    if (!currentContainer) return;
+
+    const items = getItems(currentContainer).filter(el => el !== dragItem);
+    const pointerY = e.clientY;
+    let placed = false;
+    for (const sib of items) {
+      const rect = sib.getBoundingClientRect();
+      const mid = rect.top + rect.height / 2;
+      if (pointerY < mid) {
+        if (sib.previousElementSibling !== dragItem) currentContainer.insertBefore(dragItem, sib);
+        placed = true;
+        break;
+      }
+    }
+    if (!placed && currentContainer.lastElementChild !== dragItem) {
+      currentContainer.appendChild(dragItem);
+    }
+  }
+
+  function onPointerUp(){
+    if (!dragItem) return;
+    document.removeEventListener('pointermove', onPointerMove);
+    document.removeEventListener('pointerup', onPointerUp);
+    document.removeEventListener('pointercancel', onPointerUp);
+
+    dragItem.classList.remove('dragging');
+    if (ghost) { ghost.remove(); ghost = null; }
+
+    const itemId = dragItem.getAttribute('data-id');
+    const fromContainer = originContainer;
+    const finalContainer = currentContainer;
+    const finalOrderIds = getItems(finalContainer).map(el => el.getAttribute('data-id'));
+    dragItem = null;
+
+    refreshEmptyState(finalContainer);
+    if (fromContainer !== finalContainer) refreshEmptyState(fromContainer);
+
+    const toDate = finalContainer.closest('.week-day').getAttribute('data-date');
+    if (fromContainer !== finalContainer) {
+      onMove(itemId, toDate, finalOrderIds);
+    } else {
+      onReorder(toDate, finalOrderIds);
+    }
+
+    originContainer = null;
+    currentContainer = null;
+    if (onDragStateChange) setTimeout(() => onDragStateChange(false), 50);
+  }
+
+  containerList.forEach(c => c.addEventListener('pointerdown', onPointerDown));
+}
+
 (function initDayPlanner(){
   const emptyState = document.getElementById('dayPanelEmpty');
   const contentState = document.getElementById('dayPanelContent');
@@ -290,6 +424,24 @@ function makeSortable(container, onReorder, onDragStateChange){
     }).catch(() => {});
   }
 
+  function moveEntry(itemId, toDate, orderedIds){
+    const entry = allEntries.find(e => e.id === itemId);
+    const fromDate = entry ? entry.date : null;
+    if (entry) entry.date = toDate;
+    orderedIds.forEach((id, index) => {
+      const e2 = allEntries.find(en => en.id === id);
+      if (e2) e2.order = index;
+    });
+    updateBadges();
+    renderWeekView();
+    if (fromDate === currentDate || toDate === currentDate) renderEntriesFor(currentDate);
+    if (!isConfigured()) return;
+    fetch(DAY_PLANNER_CONFIG.apiUrl, {
+      method: 'POST',
+      body: JSON.stringify({ action: 'move', id: itemId, date: toDate, orderedIds }),
+    }).catch(() => {});
+  }
+
   function renderWeekView(){
     if (!weekGrid) return;
     const days = weeks[currentWeekIndex];
@@ -319,13 +471,13 @@ function makeSortable(container, onReorder, onDragStateChange){
       </div>`;
     }).join('');
 
-    weekGrid.querySelectorAll('.week-day-entries').forEach(list => {
-      const cell = list.closest('.week-day');
-      const dateStr = cell.getAttribute('data-date');
-      if (dateStr) {
-        makeSortable(list, orderedIds => reorderDay(dateStr, orderedIds), dragging => { isDraggingEntry = dragging; });
-      }
-    });
+    const dropTargets = Array.from(weekGrid.querySelectorAll('.week-day.clickable .week-day-entries'));
+    makeCrossDaySortable(
+      dropTargets,
+      (dateStr, orderedIds) => reorderDay(dateStr, orderedIds),
+      (itemId, toDate, orderedIds) => moveEntry(itemId, toDate, orderedIds),
+      dragging => { isDraggingEntry = dragging; }
+    );
 
     if (weekGrid.dataset.bound !== 'true') {
       weekGrid.addEventListener('click', e => {

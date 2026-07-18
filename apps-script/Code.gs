@@ -80,17 +80,32 @@ function doPost(e) {
 
   if (body.action === 'reorder') {
     const data = sheet.getDataRange().getValues();
-    const orderedIds = body.orderedIds || [];
-    orderedIds.forEach((id, index) => {
-      for (let i = 1; i < data.length; i++) {
-        if (data[i][0] === id) {
-          sheet.getRange(i + 1, 7).setValue(index); // column 7 = Order
-          break;
-        }
+    applyOrder_(sheet, data, body.orderedIds || []);
+    return jsonResponse_({ success: true });
+  }
+
+  if (body.action === 'move') {
+    const data = sheet.getDataRange().getValues();
+    for (let i = 1; i < data.length; i++) {
+      if (data[i][0] === body.id) {
+        sheet.getRange(i + 1, 2).setValue(body.date); // column 2 = Date
+        break;
       }
-    });
+    }
+    applyOrder_(sheet, data, body.orderedIds || []);
     return jsonResponse_({ success: true });
   }
 
   return jsonResponse_({ success: false, error: 'Unknown action: ' + body.action });
+}
+
+function applyOrder_(sheet, data, orderedIds) {
+  orderedIds.forEach((id, index) => {
+    for (let i = 1; i < data.length; i++) {
+      if (data[i][0] === id) {
+        sheet.getRange(i + 1, 7).setValue(index); // column 7 = Order
+        break;
+      }
+    }
+  });
 }

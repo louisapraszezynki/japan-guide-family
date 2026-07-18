@@ -477,6 +477,7 @@ a{color:var(--vermillion);}
 .week-day.clickable{cursor:pointer;}
 .week-day.clickable:hover{background:var(--vermillion-soft); opacity:.9;}
 .week-day-label{font-weight:700; font-size:.8rem; margin-bottom:8px; color:var(--ink); text-transform:capitalize;}
+.week-day-entries{min-height:40px;}
 .week-day-empty{font-size:.74rem; color:var(--ink-soft);}
 .week-entry{
   font-size:.74rem; padding:4px 7px; border-radius:6px; background:var(--paper);

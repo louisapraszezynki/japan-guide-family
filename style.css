@@ -479,7 +479,7 @@ a{color:var(--vermillion);}
   display:grid; grid-template-columns:repeat(6, 1fr); gap:4px;
   background:var(--paper); border:1px solid var(--line); border-radius:12px;
   padding:10px; box-shadow:0 12px 30px -10px rgba(0,0,0,.3);
-  width:min(280px, 100%);
+  width:min(280px, calc(100vw - 32px));
 }
 .emoji-picker-grid[hidden]{display:none;}
 .emoji-picker-grid button{

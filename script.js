@@ -86,6 +86,7 @@ function makeSortable(container, onReorder, onDragStateChange){
 
   function onPointerDown(e){
     if (e.pointerType === 'mouse' && e.button !== 0) return;
+    if (e.target.closest('.day-entry-delete')) return;
     const item = e.target.closest('[data-id]');
     if (!item || item.parentElement !== container) return;
 
@@ -442,6 +443,27 @@ function makeCrossDaySortable(containers, onReorder, onMove, onDragStateChange){
     }).catch(() => {});
   }
 
+  function deleteEntry(id){
+    if (!confirm('Supprimer cette idée ?')) return;
+    const entry = allEntries.find(e => e.id === id);
+    const dateStr = entry ? entry.date : null;
+    allEntries = allEntries.filter(e => e.id !== id);
+    updateBadges();
+    renderWeekView();
+    if (dateStr === currentDate) renderEntriesFor(currentDate);
+    if (!isConfigured()) return;
+    fetch(DAY_PLANNER_CONFIG.apiUrl, {
+      method: 'POST',
+      body: JSON.stringify({ action: 'delete', id }),
+    }).catch(() => {});
+  }
+
+  entriesEl.addEventListener('click', e => {
+    const btn = e.target.closest('.day-entry-delete');
+    if (!btn) return;
+    deleteEntry(btn.getAttribute('data-id'));
+  });
+
   function renderWeekView(){
     if (!weekGrid) return;
     const days = weeks[currentWeekIndex];
@@ -511,6 +533,7 @@ function makeCrossDaySortable(containers, onReorder, onMove, onDragStateChange){
       return;
     }
     entriesEl.innerHTML = items.map(item => `<div class="day-entry ${getCategoryColorClass(item.category)}" data-id="${item.id}">
+        <button type="button" class="day-entry-delete" data-id="${item.id}" aria-label="Supprimer">✕</button>
         <div class="day-entry-meta">
           <span class="day-entry-category">${item.emoji || '🏷️'} ${escapeHtml(item.category)}</span>
         </div>

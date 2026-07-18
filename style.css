@@ -380,9 +380,17 @@ a{color:var(--vermillion);}
 }
 .day-panel-status{color:var(--ink-soft); font-size:.88rem;}
 .day-entry{
-  background:var(--paper-alt); border-radius:10px; padding:10px 14px; font-size:.92rem;
-  border-left:4px solid var(--line);
+  background:var(--paper-alt); border-radius:10px; padding:10px 34px 10px 14px; font-size:.92rem;
+  border-left:4px solid var(--line); position:relative;
 }
+.day-entry-delete{
+  position:absolute; top:8px; right:8px; width:22px; height:22px;
+  border:none; background:var(--paper); border-radius:50%;
+  color:var(--ink-soft); font-size:.7rem; line-height:1; cursor:pointer;
+  display:flex; align-items:center; justify-content:center;
+  touch-action:auto;
+}
+.day-entry-delete:hover{background:var(--vermillion); color:#fff;}
 .section.alt .day-entry{background:var(--paper);}
 .day-entry.cat-color-0{border-left-color:var(--vermillion);}
 .day-entry.cat-color-1{border-left-color:var(--indigo);}

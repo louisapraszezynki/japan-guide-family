@@ -96,6 +96,17 @@ function doPost(e) {
     return jsonResponse_({ success: true });
   }
 
+  if (body.action === 'delete') {
+    const data = sheet.getDataRange().getValues();
+    for (let i = 1; i < data.length; i++) {
+      if (data[i][0] === body.id) {
+        sheet.deleteRow(i + 1);
+        break;
+      }
+    }
+    return jsonResponse_({ success: true });
+  }
+
   return jsonResponse_({ success: false, error: 'Unknown action: ' + body.action });
 }
 

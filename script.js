@@ -53,19 +53,31 @@ document.querySelectorAll('.image-placeholder[data-slot]').forEach(el => {
 (function initSpeakButtons(){
   const buttons = document.querySelectorAll('.speak-btn');
   if (!buttons.length) return;
-  if (!('speechSynthesis' in window)) {
-    buttons.forEach(btn => { btn.disabled = true; btn.title = 'Lecture vocale non disponible sur ce navigateur'; });
-    return;
-  }
+  const supportsSpeech = 'speechSynthesis' in window;
   buttons.forEach(btn => {
+    const audioSrc = btn.getAttribute('data-audio');
+    if (!audioSrc && !supportsSpeech) {
+      btn.disabled = true;
+      btn.title = 'Lecture vocale non disponible sur ce navigateur';
+      return;
+    }
     btn.addEventListener('click', () => {
+      buttons.forEach(b => b.classList.remove('speaking'));
+      btn.classList.add('speaking');
+      // Prefer a real recorded clip when we have one; it sounds far more
+      // natural than the browser's synthesized Japanese voice.
+      if (audioSrc) {
+        const audio = new Audio(audioSrc);
+        audio.onended = () => btn.classList.remove('speaking');
+        audio.onerror = () => btn.classList.remove('speaking');
+        audio.play().catch(() => btn.classList.remove('speaking'));
+        return;
+      }
       const text = btn.getAttribute('data-jp');
       window.speechSynthesis.cancel();
       const utterance = new SpeechSynthesisUtterance(text);
       utterance.lang = 'ja-JP';
       utterance.rate = 0.85;
-      buttons.forEach(b => b.classList.remove('speaking'));
-      btn.classList.add('speaking');
       utterance.onend = () => btn.classList.remove('speaking');
       utterance.onerror = () => btn.classList.remove('speaking');
       window.speechSynthesis.speak(utterance);

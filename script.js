@@ -316,6 +316,11 @@ function makeCrossDaySortable(containers, onReorder, onMove, onDragStateChange){
   const formStatus = document.getElementById('dayPanelStatus');
   const dayButtons = document.querySelectorAll('.cal-day.highlight[data-date]');
 
+  const backlogList = document.getElementById('backlogList');
+  const backlogAddBtn = document.getElementById('backlogAddBtn');
+  const backlogForm = document.getElementById('backlogForm');
+  const backlogInput = document.getElementById('backlogInput');
+
   const weekGrid = document.getElementById('weekGrid');
   const weekLabel = document.getElementById('weekLabel');
   const weekPrevBtn = document.getElementById('weekPrev');
@@ -405,6 +410,7 @@ function makeCrossDaySortable(containers, onReorder, onMove, onDragStateChange){
         allEntries = (data.entries || []).slice().sort((a, b) => (Number(a.order) || 0) - (Number(b.order) || 0));
         updateBadges();
         renderWeekView();
+        renderBacklog();
       })
       .catch(() => {});
   }
@@ -463,6 +469,70 @@ function makeCrossDaySortable(containers, onReorder, onMove, onDragStateChange){
     if (!btn) return;
     deleteEntry(btn.getAttribute('data-id'));
   });
+
+  // Ideas backlog: entries with no date attached (date === ''), shown in
+  // place of the day panel's empty state. Reuses the same add/delete API.
+  function renderBacklog(){
+    if (!backlogList) return;
+    const items = allEntries
+      .filter(item => item.date === '')
+      .slice()
+      .sort((a, b) => (Number(a.order) || 0) - (Number(b.order) || 0));
+    if (!items.length) {
+      backlogList.innerHTML = '<p class="backlog-empty">Aucune idée pour l\'instant.</p>';
+      return;
+    }
+    backlogList.innerHTML = items.map(item =>
+      `<div class="backlog-item"><span>${escapeHtml(item.text)}</span><button type="button" class="backlog-item-delete" data-id="${item.id}" aria-label="Supprimer">✕</button></div>`
+    ).join('');
+  }
+
+  if (backlogList) {
+    backlogList.addEventListener('click', e => {
+      const btn = e.target.closest('.backlog-item-delete');
+      if (!btn) return;
+      const id = btn.getAttribute('data-id');
+      if (!confirm('Supprimer cette idée ?')) return;
+      allEntries = allEntries.filter(en => en.id !== id);
+      renderBacklog();
+      if (!isConfigured()) return;
+      fetch(DAY_PLANNER_CONFIG.apiUrl, {
+        method: 'POST',
+        body: JSON.stringify({ action: 'delete', id }),
+      }).catch(() => {});
+    });
+
+    backlogAddBtn.addEventListener('click', () => {
+      backlogForm.hidden = !backlogForm.hidden;
+      if (!backlogForm.hidden) backlogInput.focus();
+    });
+
+    backlogForm.addEventListener('submit', e => {
+      e.preventDefault();
+      const text = backlogInput.value.trim();
+      if (!text || !isConfigured()) return;
+      const submitBtn = backlogForm.querySelector('button');
+      submitBtn.disabled = true;
+      fetch(DAY_PLANNER_CONFIG.apiUrl, {
+        method: 'POST',
+        body: JSON.stringify({ action: 'add', date: '', name: '', category: '', emoji: '', text }),
+      })
+        .then(res => res.json())
+        .then(result => {
+          if (!result || !result.success) throw new Error('add failed');
+          allEntries.push({ id: result.id, date: '', name: '', category: '', emoji: '', text, order: result.order });
+          renderBacklog();
+          backlogInput.value = '';
+          backlogForm.hidden = true;
+        })
+        .catch(() => {
+          alert("Erreur lors de l'ajout, réessayez.");
+        })
+        .finally(() => {
+          submitBtn.disabled = false;
+        });
+    });
+  }
 
   function renderWeekView(){
     if (!weekGrid) return;
@@ -630,6 +700,7 @@ function makeCrossDaySortable(containers, onReorder, onMove, onDragStateChange){
       });
   });
 
+  renderBacklog();
   fetchAllEntries();
 })();
 

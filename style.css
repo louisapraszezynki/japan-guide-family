@@ -194,13 +194,19 @@ html.trip-started .section-num::before{content:attr(data-after);}
    keyframes for each face only ever wobble around THAT face's own resting
    spot (never jump to someone else's). */
 .hero-intro{
-  position:absolute; inset:0; z-index:5; background:var(--paper);
+  position:absolute; inset:0; z-index:5; background:#fff;
   overflow:hidden; opacity:1; transition:opacity .6s ease;
 }
 .hero-intro.dismissed{opacity:0; pointer-events:none;}
-.hero-intro-map.image-placeholder{
+.hero-intro-map-frame{
   position:absolute; left:50%; top:50%; transform:translate(-50%,-50%);
-  width:min(90vw, 620px); height:min(90vh, 620px);
+  width:min(78vw, 520px); height:min(78vh, 520px);
+  border-radius:50%; padding:32px; box-sizing:border-box;
+  background:radial-gradient(circle, var(--paper-alt) 0%, #fff 74%);
+  box-shadow:0 20px 60px -20px rgba(43,54,85,.18), inset 0 0 0 1px var(--line);
+}
+.hero-intro-map.image-placeholder{
+  width:100%; height:100%;
   border:none; background-color:transparent; background-image:none; min-height:0;
   background-size:contain; background-repeat:no-repeat; background-position:center;
 }

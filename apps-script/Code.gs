@@ -128,7 +128,7 @@ function fetchIcloudPhotos_() {
     .map(p => {
       const derivatives = p.derivatives || {};
       const sizes = Object.keys(derivatives).map(Number).sort((a, b) => a - b);
-      const thumbSize = sizes.find(s => s >= 640) || sizes[sizes.length - 1];
+      const thumbSize = sizes.find(s => s >= 300) || sizes[sizes.length - 1];
       const fullSize = sizes[sizes.length - 1];
       return {
         guid: p.photoGuid,

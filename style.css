@@ -214,14 +214,14 @@ html.trip-started .section-num::before{content:attr(data-after);}
 .face-me{transform:translate(-50%,-50%);}
 
 .face-mom{transform:translate(calc(-50% - 14px), calc(-50% - 40px));}
-.face-mom{animation:intro-slide-in-mom 1.7s cubic-bezier(.22,.85,.3,1) .2s both;}
+.face-mom{animation:intro-slide-in-mom 2.8s cubic-bezier(.22,.85,.3,1) .2s both;}
 @keyframes intro-slide-in-mom{
   from{transform:translate(calc(-50% - 14px - 140vw), calc(-50% - 40px));}
   to{transform:translate(calc(-50% - 14px), calc(-50% - 40px));}
 }
 
 .face-brother{transform:translate(calc(-50% - 14px), calc(-50% + 40px));}
-.face-brother{animation:intro-slide-in-brother 1.9s cubic-bezier(.22,.85,.3,1) .5s both;}
+.face-brother{animation:intro-slide-in-brother 3.1s cubic-bezier(.22,.85,.3,1) .5s both;}
 @keyframes intro-slide-in-brother{
   from{transform:translate(calc(-50% - 14px - 140vw), calc(-50% + 40px));}
   to{transform:translate(calc(-50% - 14px), calc(-50% + 40px));}
@@ -234,29 +234,53 @@ html.trip-started .section-num::before{content:attr(data-after);}
 .face-mom.settled{transform:translate(calc(-50% - 14px), calc(-50% - 40px)); animation:none;}
 .face-brother.settled{transform:translate(calc(-50% - 14px), calc(-50% + 40px)); animation:none;}
 
-.face-me.vibrating{animation:intro-vibrate-me .6s ease-in-out;}
+/* Longer, many-beat "partying" shake (~1.6s) rather than one quick jitter,
+   built from the same handful of offsets repeated with slight variation
+   so it stays lively across the whole duration instead of slowing down. */
+.face-me.vibrating{animation:intro-vibrate-me 1.6s ease-in-out;}
 @keyframes intro-vibrate-me{
   0%,100%{transform:translate(-50%,-50%);}
-  20%{transform:translate(calc(-50% - 4px), calc(-50% - 3px));}
-  40%{transform:translate(calc(-50% + 4px), calc(-50% + 3px));}
-  60%{transform:translate(calc(-50% - 3px), calc(-50% + 4px));}
-  80%{transform:translate(calc(-50% + 3px), calc(-50% - 4px));}
+  8%{transform:translate(calc(-50% - 4px), calc(-50% - 3px));}
+  17%{transform:translate(calc(-50% + 4px), calc(-50% + 3px));}
+  25%{transform:translate(calc(-50% - 3px), calc(-50% + 4px));}
+  33%{transform:translate(calc(-50% + 3px), calc(-50% - 4px));}
+  42%{transform:translate(calc(-50% - 4px), calc(-50% + 3px));}
+  50%{transform:translate(calc(-50% + 4px), calc(-50% - 3px));}
+  58%{transform:translate(calc(-50% - 3px), calc(-50% - 4px));}
+  67%{transform:translate(calc(-50% + 3px), calc(-50% + 4px));}
+  75%{transform:translate(calc(-50% - 4px), calc(-50% - 2px));}
+  83%{transform:translate(calc(-50% + 4px), calc(-50% + 2px));}
+  92%{transform:translate(calc(-50% - 2px), calc(-50% + 3px));}
 }
-.face-mom.vibrating{animation:intro-vibrate-mom .6s ease-in-out;}
+.face-mom.vibrating{animation:intro-vibrate-mom 1.6s ease-in-out;}
 @keyframes intro-vibrate-mom{
   0%,100%{transform:translate(calc(-50% - 14px), calc(-50% - 40px));}
-  20%{transform:translate(calc(-50% - 18px), calc(-50% - 43px));}
-  40%{transform:translate(calc(-50% - 10px), calc(-50% - 37px));}
-  60%{transform:translate(calc(-50% - 17px), calc(-50% - 36px));}
-  80%{transform:translate(calc(-50% - 11px), calc(-50% - 44px));}
+  8%{transform:translate(calc(-50% - 18px), calc(-50% - 43px));}
+  17%{transform:translate(calc(-50% - 10px), calc(-50% - 37px));}
+  25%{transform:translate(calc(-50% - 17px), calc(-50% - 36px));}
+  33%{transform:translate(calc(-50% - 11px), calc(-50% - 44px));}
+  42%{transform:translate(calc(-50% - 18px), calc(-50% - 37px));}
+  50%{transform:translate(calc(-50% - 10px), calc(-50% - 43px));}
+  58%{transform:translate(calc(-50% - 17px), calc(-50% - 44px));}
+  67%{transform:translate(calc(-50% - 11px), calc(-50% - 36px));}
+  75%{transform:translate(calc(-50% - 18px), calc(-50% - 42px));}
+  83%{transform:translate(calc(-50% - 10px), calc(-50% - 38px));}
+  92%{transform:translate(calc(-50% - 12px), calc(-50% - 43px));}
 }
-.face-brother.vibrating{animation:intro-vibrate-brother .6s ease-in-out;}
+.face-brother.vibrating{animation:intro-vibrate-brother 1.6s ease-in-out;}
 @keyframes intro-vibrate-brother{
   0%,100%{transform:translate(calc(-50% - 14px), calc(-50% + 40px));}
-  20%{transform:translate(calc(-50% - 18px), calc(-50% + 37px));}
-  40%{transform:translate(calc(-50% - 10px), calc(-50% + 43px));}
-  60%{transform:translate(calc(-50% - 17px), calc(-50% + 44px));}
-  80%{transform:translate(calc(-50% - 11px), calc(-50% + 36px));}
+  8%{transform:translate(calc(-50% - 18px), calc(-50% + 37px));}
+  17%{transform:translate(calc(-50% - 10px), calc(-50% + 43px));}
+  25%{transform:translate(calc(-50% - 17px), calc(-50% + 44px));}
+  33%{transform:translate(calc(-50% - 11px), calc(-50% + 36px));}
+  42%{transform:translate(calc(-50% - 18px), calc(-50% + 43px));}
+  50%{transform:translate(calc(-50% - 10px), calc(-50% + 37px));}
+  58%{transform:translate(calc(-50% - 17px), calc(-50% + 36px));}
+  67%{transform:translate(calc(-50% - 11px), calc(-50% + 44px));}
+  75%{transform:translate(calc(-50% - 18px), calc(-50% + 38px));}
+  83%{transform:translate(calc(-50% - 10px), calc(-50% + 42px));}
+  92%{transform:translate(calc(-50% - 12px), calc(-50% + 37px));}
 }
 
 @media (max-width:640px){

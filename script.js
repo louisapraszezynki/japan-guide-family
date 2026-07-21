@@ -22,6 +22,12 @@ document.querySelectorAll('.image-placeholder[data-slot]').forEach(el => {
   const forceAnim = new URLSearchParams(location.search).get('anim') === '1';
   if (!forceAnim && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
 
+  // Browsers restore the previous scroll position on reload, which would
+  // otherwise fire a scroll event immediately and dismiss the intro before
+  // you ever see it. Force every load/reload to start at the top instead.
+  if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
+  window.scrollTo(0, 0);
+
   let dismissed = false;
   let grouped = false;
 
@@ -45,7 +51,7 @@ document.querySelectorAll('.image-placeholder[data-slot]').forEach(el => {
     setTimeout(() => {
       faces.forEach(f => f.classList.remove('vibrating'));
       grouped = true;
-    }, 650);
+    }, 1650);
   }
   if (brotherEl) brotherEl.addEventListener('animationend', startVibrate, { once: true });
 

@@ -194,7 +194,11 @@ html.trip-started .section-num::before{content:attr(data-after);}
    keyframes for each face only ever wobble around THAT face's own resting
    spot (never jump to someone else's). */
 .hero-intro{
-  position:absolute; inset:0; z-index:5; background:var(--paper);
+  /* Fixed (not absolute) so it centers on the actual viewport rather than
+     on .hero's own box, which is often taller than the visible screen
+     (min-height:100svh plus its padding/content can exceed that), which
+     was pushing the map below the fold on load. */
+  position:fixed; inset:0; z-index:5; background:var(--paper);
   overflow:hidden; opacity:1; transition:opacity .6s ease;
 }
 .hero-intro.dismissed{opacity:0; pointer-events:none;}

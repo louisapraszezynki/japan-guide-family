@@ -13,14 +13,26 @@ document.querySelectorAll('.image-placeholder[data-slot]').forEach(el => {
 // Hero opening animation: mom and brother's circles slide in from the
 // left onto the Japan map to join mine, everyone gives a little happy
 // shake once reunited, then the group drifts gently with the pointer.
-// Scrolling at any point permanently dismisses it.
+// Scrolling at any point permanently dismisses it and reveals the title.
 (function initHeroIntro(){
   const introEl = document.getElementById('heroIntro');
   const groupEl = document.getElementById('heroIntroGroup');
   const heroEl = document.getElementById('hero');
-  if (!introEl || !groupEl || !heroEl) return;
+  const heroContentEl = document.querySelector('.hero-content');
+  const heroImageEl = document.querySelector('.hero-image');
+
+  function revealHeroContent(){
+    if (heroContentEl) heroContentEl.classList.add('in-view');
+    if (heroImageEl) setTimeout(() => heroImageEl.classList.add('in-view'), 150);
+  }
+
+  if (!introEl || !groupEl || !heroEl) { revealHeroContent(); return; }
   const forceAnim = new URLSearchParams(location.search).get('anim') === '1';
-  if (!forceAnim && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  if (!forceAnim && window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    introEl.classList.add('dismissed');
+    revealHeroContent();
+    return;
+  }
 
   // Browsers restore the previous scroll position on reload, which would
   // otherwise fire a scroll event immediately and dismiss the intro before
@@ -34,8 +46,13 @@ document.querySelectorAll('.image-placeholder[data-slot]').forEach(el => {
   function dismiss(){
     if (dismissed) return;
     dismissed = true;
-    introEl.classList.add('dismissed');
     window.removeEventListener('scroll', onScroll);
+    // Snap back to the top so the title's entrance actually plays in view,
+    // instead of finishing below the fold because the scroll gesture that
+    // triggered the dismissal already carried the page further down.
+    window.scrollTo(0, 0);
+    introEl.classList.add('dismissed');
+    revealHeroContent();
   }
   function onScroll(){
     if (window.scrollY > 10) dismiss();

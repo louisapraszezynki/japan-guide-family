@@ -52,6 +52,17 @@ function doGet(e) {
     return jsonResponse_({ photos: getIcloudPhotosCached_() });
   }
 
+  // Bypasses the cache and the try/catch in getIcloudPhotosCached_ so we
+  // can see the real error instead of a silently-empty gallery. Temporary,
+  // for debugging why photos aren't showing up.
+  if (e.parameter && e.parameter.type === 'photos-debug') {
+    try {
+      return jsonResponse_({ photos: fetchIcloudPhotos_() });
+    } catch (err) {
+      return jsonResponse_({ error: String(err), stack: err.stack || null });
+    }
+  }
+
   const sheet = getSheet_();
   const data = sheet.getDataRange().getValues();
   const rows = data.slice(1); // skip header row

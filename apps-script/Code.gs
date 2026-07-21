@@ -8,6 +8,14 @@
 const SHEET_NAME = 'Entries';
 const HEADERS = ['ID', 'Date', 'Name', 'Category', 'Emoji', 'Text', 'Order', 'CreatedAt'];
 
+// The family iCloud Shared Album (public, read-only). Its token is the
+// part after "#" in the album's public link.
+const ICLOUD_ALBUM_TOKEN = 'B24JtdOXmKOo432';
+const ICLOUD_PHOTOS_CACHE_KEY = 'icloud_photos_v1';
+const ICLOUD_PHOTOS_CACHE_SECONDS = 300; // 5 min: browsers can't call Apple's API
+// directly (no CORS headers), so this proxies + caches it to stay fast and
+// avoid hammering Apple's servers on every page load.
+
 function getSheet_() {
   const ss = SpreadsheetApp.getActiveSpreadsheet();
   let sheet = ss.getSheetByName(SHEET_NAME);
@@ -40,6 +48,10 @@ function normalizeDate_(val) {
 }
 
 function doGet(e) {
+  if (e.parameter && e.parameter.type === 'photos') {
+    return jsonResponse_({ photos: getIcloudPhotosCached_() });
+  }
+
   const sheet = getSheet_();
   const data = sheet.getDataRange().getValues();
   const rows = data.slice(1); // skip header row
@@ -55,6 +67,79 @@ function doGet(e) {
     }))
     .filter(entry => entry.id);
   return jsonResponse_({ entries: entries });
+}
+
+// ---------- iCloud Shared Album photo gallery ----------
+
+function getIcloudPhotosCached_() {
+  const cache = CacheService.getScriptCache();
+  const cached = cache.get(ICLOUD_PHOTOS_CACHE_KEY);
+  if (cached) return JSON.parse(cached);
+
+  let photos = [];
+  try {
+    photos = fetchIcloudPhotos_();
+  } catch (err) {
+    return []; // fail quietly: show an empty gallery rather than break the page
+  }
+  cache.put(ICLOUD_PHOTOS_CACHE_KEY, JSON.stringify(photos), ICLOUD_PHOTOS_CACHE_SECONDS);
+  return photos;
+}
+
+function icloudFetch_(host, token, path, payload) {
+  const resp = UrlFetchApp.fetch(`https://${host}/${token}/sharedstreams/${path}`, {
+    method: 'post',
+    contentType: 'application/json',
+    payload: JSON.stringify(payload),
+    muteHttpExceptions: true,
+  });
+  return JSON.parse(resp.getContentText());
+}
+
+function fetchIcloudPhotos_() {
+  const token = ICLOUD_ALBUM_TOKEN;
+  let host = 'p23-sharedstreams.icloud.com';
+  let stream;
+  // Apple's API replies with a different partition host on first contact;
+  // re-request against that host once it's given.
+  for (let i = 0; i < 3; i++) {
+    stream = icloudFetch_(host, token, 'webstream', { streamCtag: null });
+    if (stream['X-Apple-MMe-Host'] && stream['X-Apple-MMe-Host'] !== host) {
+      host = stream['X-Apple-MMe-Host'];
+      continue;
+    }
+    break;
+  }
+
+  const photos = stream.photos || [];
+  if (!photos.length) return [];
+
+  const guids = photos.map(p => p.photoGuid);
+  const assetData = icloudFetch_(host, token, 'webasseturls', { photoGuids: guids });
+  const items = assetData.items || {};
+
+  function urlFor(derivative) {
+    if (!derivative) return null;
+    const asset = items[derivative.checksum];
+    return asset ? `https://${asset.url_location}${asset.url_path}` : null;
+  }
+
+  return photos
+    .map(p => {
+      const derivatives = p.derivatives || {};
+      const sizes = Object.keys(derivatives).map(Number).sort((a, b) => a - b);
+      const thumbSize = sizes.find(s => s >= 640) || sizes[sizes.length - 1];
+      const fullSize = sizes[sizes.length - 1];
+      return {
+        guid: p.photoGuid,
+        caption: p.caption || '',
+        thumbUrl: urlFor(derivatives[String(thumbSize)]),
+        fullUrl: urlFor(derivatives[String(fullSize)]),
+        dateCreated: p.dateCreated || p.batchDateCreated || null,
+      };
+    })
+    .filter(p => p.thumbUrl)
+    .sort((a, b) => (b.dateCreated || '').localeCompare(a.dateCreated || ''));
 }
 
 function doPost(e) {

@@ -779,6 +779,62 @@ function makeCrossDaySortable(containers, onReorder, onMove, onDragStateChange){
   fetchAllEntries();
 })();
 
+// ---------- Photo gallery (iCloud Shared Album, proxied through the same
+// Apps Script backend since browsers can't call Apple's API directly) ----------
+(function initPhotoGallery(){
+  const galleryEl = document.getElementById('photoGallery');
+  if (!galleryEl) return;
+  const apiUrl = DAY_PLANNER_CONFIG.apiUrl;
+  if (!apiUrl) {
+    galleryEl.innerHTML = '<p class="photo-gallery-empty">Galerie pas encore configurée.</p>';
+    return;
+  }
+
+  const lightbox = document.getElementById('photoLightbox');
+  const lightboxImg = document.getElementById('photoLightboxImg');
+  const lightboxClose = document.getElementById('photoLightboxClose');
+
+  function escapeHtml(str){
+    const div = document.createElement('div');
+    div.textContent = str || '';
+    return div.innerHTML;
+  }
+
+  function openLightbox(fullUrl, caption){
+    lightboxImg.src = fullUrl;
+    lightboxImg.alt = caption || '';
+    lightbox.hidden = false;
+  }
+  function closeLightbox(){
+    lightbox.hidden = true;
+    lightboxImg.src = '';
+  }
+  lightboxClose.addEventListener('click', closeLightbox);
+  lightbox.addEventListener('click', e => { if (e.target === lightbox) closeLightbox(); });
+
+  fetch(`${apiUrl}?type=photos&_=${Date.now()}`)
+    .then(res => res.json())
+    .then(data => {
+      const photos = data.photos || [];
+      if (!photos.length) {
+        galleryEl.innerHTML = '<p class="photo-gallery-empty">Aucune photo pour l\'instant — ajoutez-en depuis l\'app Photos !</p>';
+        return;
+      }
+      galleryEl.innerHTML = '';
+      photos.forEach(p => {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'photo-thumb';
+        btn.innerHTML = `<img src="${p.thumbUrl}" loading="lazy" alt="${escapeHtml(p.caption || '')}">`;
+        btn.addEventListener('click', () => openLightbox(p.fullUrl || p.thumbUrl, p.caption));
+        galleryEl.appendChild(btn);
+      });
+    })
+    .catch(() => {
+      galleryEl.innerHTML = '<p class="photo-gallery-empty">Impossible de charger les photos pour le moment.</p>';
+    });
+})();
+
 // Active dot nav tracking
 const sections = document.querySelectorAll('.section');
 const dots = document.querySelectorAll('.dot-nav .dot');

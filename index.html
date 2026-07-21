@@ -22,7 +22,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;700&family=Zen+Maru+Gothic:wght@400;500;700&display=swap">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
-<link rel="stylesheet" href="style.css?v=52">
+<link rel="stylesheet" href="style.css?v=53">
 </head>
 <body>
 
@@ -233,7 +233,7 @@
     <div class="card-grid">
       <div class="card wide reveal">
         <h3>🏠 Notre maison</h3>
-        <p>Yonezawa se trouve dans la préfecture de Yamagata, à quelques heures de Shinkansen au nord de Tokyo.</p>
+        <p>Yonezawa se trouve dans la préfecture de Yamagata, à 2 heures de Shinkansen au nord de Tokyo.</p>
         <div class="japan-map reveal" id="japanMap" role="img" aria-label="Carte interactive du Japon avec Yonezawa, Tokyo et le Mont Fuji"></div>
         <p class="map-hint">🖐️ Glisse pour te déplacer, utilise les boutons +/- (ou pince-zoom) pour zoomer.</p>
         <p class="note">✈️ Dans l'avion direction le Japon, le Mont Fuji sera du côté gauche, si jamais vous avez un siège de ce côté !</p>
@@ -474,8 +474,8 @@
       <div class="card wide reveal">
         <h3>🚄 Le Shinkansen</h3>
         <p>Pour voyager en Shinkansen (l'équivalent du TGV) à travers le Japon, certaines lignes ont des sites de réservation en ligne, d'autres non : certains billets s'achètent donc directement en gare.</p>
-        <p>Vous pouvez voyager debout même si les places assises sont épuisées, tant que le train comprend des wagons sans réservation.</p>
-        <p>Le prix des billets est toujours le même, que vous réserviez 3 semaines à l'avance ou 30 minutes avant le départ.</p>
+        <p>Vous pouvez voyager debout même si les places assises sont épuisées, tant que le train comprend des wagons sans réservation : ce sont les <strong>« Non-reserved seats »</strong>.</p>
+        <p>Le prix des billets pour un même trajet est toujours le même, que vous réserviez 3 semaines à l'avance ou 30 minutes avant le départ.</p>
       </div>
 
       <div class="card wide reveal">
@@ -543,13 +543,15 @@
     <div class="section-head reveal">
       <span class="section-num" data-before="08" data-after="02"></span>
       <h2>Photos</h2>
-      <p class="section-intro">Nos souvenirs du voyage, ajoutés par tout le monde depuis l'app Photos.</p>
+      <p class="section-intro">Ajoutez vos photos souvenirs dans notre carnet de voyage !</p>
     </div>
 
     <div class="card-grid">
       <div class="card wide reveal">
-        <p class="photos-hint">📸 Tout le monde peut ajouter ses photos : ouvrez l'album partagé <strong>« Japon Prasz »</strong> dans l'app Photos (iPhone/Mac) et ajoutez-en directement depuis votre pellicule. Elles apparaîtront ici automatiquement.</p>
-        <div class="photo-gallery" id="photoGallery">
+        <div class="photos-instructions">
+          <p>📸 Ouvrez l'album partagé <strong>« Japon Prasz »</strong> dans l'application Photos de votre téléphone, ajoutez-y les photos de votre pellicule et elles apparaîtront ici !</p>
+        </div>
+        <div class="photo-marquee" id="photoGallery">
           <p class="photo-gallery-empty">Chargement des photos...</p>
         </div>
         <p class="photos-link"><a href="https://www.icloud.com/sharedalbum/#B24JtdOXmKOo432" target="_blank" rel="noopener">Voir l'album complet ↗</a></p>
@@ -575,6 +577,6 @@
 </main>
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
-<script src="script.js?v=33"></script>
+<script src="script.js?v=34"></script>
 </body>
 </html>

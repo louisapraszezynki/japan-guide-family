@@ -1007,6 +1007,15 @@ function makeCrossDaySortable(containers, onReorder, onMove, onDragStateChange){
   lightboxClose.addEventListener('click', closeLightbox);
   lightbox.addEventListener('click', e => { if (e.target === lightbox) closeLightbox(); });
 
+  function makeThumb(p){
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'photo-thumb';
+    btn.innerHTML = `<img src="${p.thumbUrl}" loading="lazy" alt="${escapeHtml(p.caption || '')}">`;
+    btn.addEventListener('click', () => openLightbox(p.fullUrl || p.thumbUrl, p.caption));
+    return btn;
+  }
+
   fetch(`${apiUrl}?type=photos&_=${Date.now()}`)
     .then(res => res.json())
     .then(data => {
@@ -1016,14 +1025,19 @@ function makeCrossDaySortable(containers, onReorder, onMove, onDragStateChange){
         return;
       }
       galleryEl.innerHTML = '';
-      photos.forEach(p => {
-        const btn = document.createElement('button');
-        btn.type = 'button';
-        btn.className = 'photo-thumb';
-        btn.innerHTML = `<img src="${p.thumbUrl}" loading="lazy" alt="${escapeHtml(p.caption || '')}">`;
-        btn.addEventListener('click', () => openLightbox(p.fullUrl || p.thumbUrl, p.caption));
-        galleryEl.appendChild(btn);
-      });
+      const track = document.createElement('div');
+      track.className = 'photo-marquee-track';
+      const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      // Duplicate the photo set so the strip can loop seamlessly: the CSS
+      // animation scrolls exactly one set's width (translateX(-50%)) then
+      // jumps back to 0, which lands on an identical-looking frame. Skip
+      // the duplication when motion is disabled, since the track just
+      // wraps statically then and a repeat would look like a glitch.
+      const items = reducedMotion ? photos : photos.concat(photos);
+      items.forEach(p => track.appendChild(makeThumb(p)));
+      // Keep the loop's pace roughly constant regardless of photo count.
+      track.style.animationDuration = `${Math.max(18, photos.length * 4)}s`;
+      galleryEl.appendChild(track);
     })
     .catch(() => {
       galleryEl.innerHTML = '<p class="photo-gallery-empty">Impossible de charger les photos pour le moment.</p>';

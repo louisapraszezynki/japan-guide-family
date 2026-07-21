@@ -23,7 +23,7 @@ document.querySelectorAll('.image-placeholder[data-slot]').forEach(el => {
 
   function revealHeroContent(){
     if (heroContentEl) heroContentEl.classList.add('in-view');
-    if (heroImageEl) setTimeout(() => heroImageEl.classList.add('in-view'), 150);
+    if (heroImageEl) setTimeout(() => heroImageEl.classList.add('in-view'), 300);
   }
 
   if (!introEl || !groupEl || !heroEl) { revealHeroContent(); return; }
@@ -62,9 +62,36 @@ document.querySelectorAll('.image-placeholder[data-slot]').forEach(el => {
   const faces = introEl.querySelectorAll('.hero-intro-face');
   const brotherEl = introEl.querySelector('.face-brother');
 
+  const CONFETTI_COLORS = ['#c8483a', '#c9a15a', '#2b3a55', '#e0917f', '#faf6ee'];
+  function burstConfetti(){
+    for (let i = 0; i < 28; i++) {
+      const piece = document.createElement('span');
+      piece.className = 'confetti-piece';
+      const angle = Math.random() * Math.PI * 2;
+      const distance = 55 + Math.random() * 95;
+      const cx = Math.cos(angle) * distance;
+      const cy = Math.sin(angle) * distance * 0.7 + 45; // slight downward drift, like gravity
+      const rot = 180 + Math.random() * 540;
+      const duration = 0.9 + Math.random() * 0.7;
+      const delay = Math.random() * 0.2;
+      const isCircle = Math.random() < 0.35;
+      piece.style.setProperty('--cx', `${cx}px`);
+      piece.style.setProperty('--cy', `${cy}px`);
+      piece.style.setProperty('--cr', `${rot}deg`);
+      piece.style.background = CONFETTI_COLORS[Math.floor(Math.random() * CONFETTI_COLORS.length)];
+      piece.style.borderRadius = isCircle ? '50%' : '2px';
+      piece.style.width = (isCircle ? 7 : 5 + Math.random() * 4) + 'px';
+      piece.style.height = (isCircle ? 7 : 10 + Math.random() * 6) + 'px';
+      piece.style.animation = `confetti-fall ${duration}s cubic-bezier(.25,.46,.45,.94) ${delay}s forwards`;
+      groupEl.appendChild(piece);
+      piece.addEventListener('animationend', () => piece.remove(), { once: true });
+    }
+  }
+
   function startVibrate(){
     if (dismissed) return;
     faces.forEach(f => f.classList.add('vibrating', 'settled'));
+    burstConfetti();
     setTimeout(() => {
       faces.forEach(f => f.classList.remove('vibrating'));
       grouped = true;

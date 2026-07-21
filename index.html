@@ -22,7 +22,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;700&family=Zen+Maru+Gothic:wght@400;500;700&display=swap">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
-<link rel="stylesheet" href="style.css?v=40">
+<link rel="stylesheet" href="style.css?v=41">
 </head>
 <body>
 
@@ -57,6 +57,23 @@
     <div class="hero-image image-placeholder reveal" data-slot="images/hero.png">
       <span class="ph-icon">🗻</span>
       <span class="ph-label">Photo d'ouverture<br><small>images/hero.jpg</small></span>
+    </div>
+
+    <div class="hero-intro" id="heroIntro">
+      <div class="hero-intro-map image-placeholder" data-slot="images/japan-map.png">
+        <span class="ph-icon">🗾</span>
+      </div>
+      <div class="hero-intro-group" id="heroIntroGroup">
+        <div class="hero-intro-face face-me image-placeholder" data-slot="images/face-moi.png">
+          <span class="ph-icon">🙂</span>
+        </div>
+        <div class="hero-intro-face face-mom image-placeholder" data-slot="images/face-maman.png">
+          <span class="ph-icon">🙂</span>
+        </div>
+        <div class="hero-intro-face face-brother image-placeholder" data-slot="images/face-frere.png">
+          <span class="ph-icon">🙂</span>
+        </div>
+      </div>
     </div>
   </section>
 
@@ -570,6 +587,6 @@
 </main>
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
-<script src="script.js?v=26"></script>
+<script src="script.js?v=27"></script>
 </body>
 </html>

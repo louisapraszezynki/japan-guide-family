@@ -10,6 +10,57 @@ document.querySelectorAll('.image-placeholder[data-slot]').forEach(el => {
   img.src = src;
 });
 
+// Hero opening animation: mom and brother's circles slide in from the
+// left onto the Japan map to join mine, everyone gives a little happy
+// shake once reunited, then the group drifts gently with the pointer.
+// Scrolling at any point permanently dismisses it.
+(function initHeroIntro(){
+  const introEl = document.getElementById('heroIntro');
+  const groupEl = document.getElementById('heroIntroGroup');
+  const heroEl = document.getElementById('hero');
+  if (!introEl || !groupEl || !heroEl) return;
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+  let dismissed = false;
+  let grouped = false;
+
+  function dismiss(){
+    if (dismissed) return;
+    dismissed = true;
+    introEl.classList.add('dismissed');
+    window.removeEventListener('scroll', onScroll);
+  }
+  function onScroll(){
+    if (window.scrollY > 10) dismiss();
+  }
+  window.addEventListener('scroll', onScroll, { passive: true });
+
+  const faces = introEl.querySelectorAll('.hero-intro-face');
+  const brotherEl = introEl.querySelector('.face-brother');
+
+  function startVibrate(){
+    if (dismissed) return;
+    faces.forEach(f => f.classList.add('vibrating', 'settled'));
+    setTimeout(() => {
+      faces.forEach(f => f.classList.remove('vibrating'));
+      grouped = true;
+    }, 650);
+  }
+  if (brotherEl) brotherEl.addEventListener('animationend', startVibrate, { once: true });
+
+  function followPointer(clientX, clientY){
+    if (!grouped || dismissed) return;
+    const rect = heroEl.getBoundingClientRect();
+    const relX = (clientX - rect.left) / rect.width - 0.5;
+    const relY = (clientY - rect.top) / rect.height - 0.5;
+    groupEl.style.transform = `translate(${relX * 50}px, ${relY * 50}px)`;
+  }
+  heroEl.addEventListener('mousemove', e => followPointer(e.clientX, e.clientY));
+  heroEl.addEventListener('touchmove', e => {
+    if (e.touches && e.touches[0]) followPointer(e.touches[0].clientX, e.touches[0].clientY);
+  }, { passive: true });
+})();
+
 // Interactive Japan map (Leaflet + OpenStreetMap), pinned on Yonezawa,
 // Tokyo and Mont Fuji. Wheel-zoom starts off so the map doesn't hijack
 // page scrolling; it turns on once the user actually clicks into it.

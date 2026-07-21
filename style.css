@@ -181,6 +181,91 @@ html.trip-started .section-num::before{content:attr(data-after);}
 }
 .waves.flip{transform:scaleY(-1); top:0; bottom:auto;}
 
+/* ---------- hero opening animation ----------
+   3 face circles arrive on a Japan map, reunite with a little happy
+   shake, then drift together with the mouse until you scroll. All
+   positions are the group's own (0,0) anchor point + a translate(-50%,-50%)
+   self-centering + a per-person pixel offset, so slide-in and vibrate
+   keyframes for each face only ever wobble around THAT face's own resting
+   spot (never jump to someone else's). */
+.hero-intro{
+  position:absolute; inset:0; z-index:5; background:var(--paper);
+  overflow:hidden; opacity:1; transition:opacity .6s ease;
+}
+.hero-intro.dismissed{opacity:0; pointer-events:none;}
+.hero-intro-map.image-placeholder{
+  position:absolute; left:50%; top:50%; transform:translate(-50%,-50%);
+  width:min(90vw, 620px); height:min(90vh, 620px);
+  border:none; background-color:transparent; background-image:none; min-height:0;
+  background-size:contain; background-repeat:no-repeat; background-position:center;
+}
+.hero-intro-map .ph-icon{font-size:5rem; opacity:.3;}
+.hero-intro-group{
+  position:absolute; left:53%; top:54%; width:0; height:0;
+  transition:transform .35s ease-out;
+}
+.hero-intro-face.image-placeholder{
+  position:absolute; width:clamp(56px, 10vw, 92px); height:clamp(56px, 10vw, 92px);
+  border-radius:50%; border:3px solid var(--paper); box-shadow:0 8px 24px -6px rgba(0,0,0,.35);
+  background-color:var(--indigo); background-image:none; min-height:0; color:#fff;
+}
+.hero-intro-face .ph-icon{font-size:1.6rem;}
+
+.face-me{transform:translate(-50%,-50%);}
+
+.face-mom{transform:translate(calc(-50% - 14px), calc(-50% - 40px));}
+.face-mom{animation:intro-slide-in-mom 1.7s cubic-bezier(.22,.85,.3,1) .2s both;}
+@keyframes intro-slide-in-mom{
+  from{transform:translate(calc(-50% - 14px - 140vw), calc(-50% - 40px));}
+  to{transform:translate(calc(-50% - 14px), calc(-50% - 40px));}
+}
+
+.face-brother{transform:translate(calc(-50% - 14px), calc(-50% + 40px));}
+.face-brother{animation:intro-slide-in-brother 1.9s cubic-bezier(.22,.85,.3,1) .5s both;}
+@keyframes intro-slide-in-brother{
+  from{transform:translate(calc(-50% - 14px - 140vw), calc(-50% + 40px));}
+  to{transform:translate(calc(-50% - 14px), calc(-50% + 40px));}
+}
+
+/* .settled is added at the same time as .vibrating (once both faces have
+   arrived) and freezes the resting transform with no animation attached,
+   so that later removing .vibrating falls back to this static state
+   instead of re-triggering the slide-in keyframes from scratch. */
+.face-mom.settled{transform:translate(calc(-50% - 14px), calc(-50% - 40px)); animation:none;}
+.face-brother.settled{transform:translate(calc(-50% - 14px), calc(-50% + 40px)); animation:none;}
+
+.face-me.vibrating{animation:intro-vibrate-me .6s ease-in-out;}
+@keyframes intro-vibrate-me{
+  0%,100%{transform:translate(-50%,-50%);}
+  20%{transform:translate(calc(-50% - 4px), calc(-50% - 3px));}
+  40%{transform:translate(calc(-50% + 4px), calc(-50% + 3px));}
+  60%{transform:translate(calc(-50% - 3px), calc(-50% + 4px));}
+  80%{transform:translate(calc(-50% + 3px), calc(-50% - 4px));}
+}
+.face-mom.vibrating{animation:intro-vibrate-mom .6s ease-in-out;}
+@keyframes intro-vibrate-mom{
+  0%,100%{transform:translate(calc(-50% - 14px), calc(-50% - 40px));}
+  20%{transform:translate(calc(-50% - 18px), calc(-50% - 43px));}
+  40%{transform:translate(calc(-50% - 10px), calc(-50% - 37px));}
+  60%{transform:translate(calc(-50% - 17px), calc(-50% - 36px));}
+  80%{transform:translate(calc(-50% - 11px), calc(-50% - 44px));}
+}
+.face-brother.vibrating{animation:intro-vibrate-brother .6s ease-in-out;}
+@keyframes intro-vibrate-brother{
+  0%,100%{transform:translate(calc(-50% - 14px), calc(-50% + 40px));}
+  20%{transform:translate(calc(-50% - 18px), calc(-50% + 37px));}
+  40%{transform:translate(calc(-50% - 10px), calc(-50% + 43px));}
+  60%{transform:translate(calc(-50% - 17px), calc(-50% + 44px));}
+  80%{transform:translate(calc(-50% - 11px), calc(-50% + 36px));}
+}
+
+@media (max-width:640px){
+  .hero-intro-group{left:50%; top:46%;}
+}
+@media (prefers-reduced-motion: reduce){
+  .hero-intro{display:none;}
+}
+
 /* ---------- cards ---------- */
 .card-grid{
   display:grid; grid-template-columns:repeat(2, 1fr); gap:28px;

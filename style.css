@@ -468,17 +468,21 @@ html.trip-started .section-num::before{content:attr(data-after);}
   .reco-image.portrait, .reco-image.landscape{width:100%; max-width:220px;}
 }
 
-.table-scroll{overflow-x:auto; margin:16px 0;}
-.weather-table{width:100%; min-width:680px; border-collapse:collapse;}
-.weather-table th, .weather-table td{
-  padding:14px 16px; text-align:center; border-bottom:1px solid var(--line); white-space:nowrap;
-}
-.weather-table thead tr{background:var(--paper-alt);}
-.section.alt .weather-table thead tr{background:var(--paper);}
-.weather-table th{color:var(--ink-soft); font-weight:600; font-size:.78rem; letter-spacing:.02em;}
-.weather-table td{font-size:1.25rem; font-weight:700; color:var(--vermillion);}
-
 /* ---------- live weather (Open-Meteo) ---------- */
+.weather-live-header{
+  display:flex; align-items:center; justify-content:space-between; gap:12px;
+  flex-wrap:wrap; margin-bottom:16px;
+}
+.weather-live-header h3{margin:0;}
+.weather-city-select{
+  font-family:inherit; font-size:.88rem; font-weight:600; color:var(--ink);
+  background:var(--paper-alt); border:1px solid var(--line); border-radius:10px;
+  padding:8px 32px 8px 14px; cursor:pointer;
+  appearance:none; -webkit-appearance:none;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%235c554c' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat:no-repeat; background-position:right 10px center; background-size:16px;
+}
+.section.alt .weather-city-select{background-color:var(--paper);}
 .weather-live-loading, .weather-live-error{color:var(--ink-soft); font-size:.9rem;}
 .weather-live-current{
   display:flex; align-items:center; gap:20px; flex-wrap:wrap;

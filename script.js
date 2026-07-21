@@ -155,9 +155,18 @@ document.querySelectorAll('.image-placeholder[data-slot]').forEach(el => {
 // for direct browser calls, so no backend proxy needed here).
 (function initWeatherLive(){
   const el = document.getElementById('weatherLive');
+  const citySelect = document.getElementById('weatherCitySelect');
   if (!el) return;
 
-  const YONEZAWA = { lat: 37.9227, lng: 140.1197 };
+  const CITIES = {
+    yonezawa: { lat: 37.9227, lng: 140.1197 },
+    tokyo: { lat: 35.6812, lng: 139.7671 },
+    kyoto: { lat: 35.0116, lng: 135.7681 },
+    fujikawaguchiko: { lat: 35.5000, lng: 138.7667 },
+    sendai: { lat: 38.2682, lng: 140.8694 },
+    niigata: { lat: 37.9161, lng: 139.0364 },
+    tsuruoka: { lat: 38.7274, lng: 139.8271 },
+  };
 
   // WMO weather codes -> emoji + short French description.
   const WEATHER_CODES = {
@@ -175,54 +184,64 @@ document.querySelectorAll('.image-placeholder[data-slot]').forEach(el => {
 
   const DAY_LABELS = ['dim', 'lun', 'mar', 'mer', 'jeu', 'ven', 'sam'];
 
-  const url = `https://api.open-meteo.com/v1/forecast?latitude=${YONEZAWA.lat}&longitude=${YONEZAWA.lng}`
-    + `&current=temperature_2m,weather_code,relative_humidity_2m,wind_speed_10m`
-    + `&daily=temperature_2m_max,temperature_2m_min,weather_code`
-    + `&timezone=Asia%2FTokyo&forecast_days=5`;
+  function loadWeather(cityKey){
+    const city = CITIES[cityKey] || CITIES.yonezawa;
+    el.innerHTML = '<p class="weather-live-loading">Chargement de la météo...</p>';
 
-  fetch(url)
-    .then(res => res.json())
-    .then(data => {
-      const current = data.current;
-      const daily = data.daily;
-      const [curIcon, curDesc] = weatherInfo(current.weather_code);
+    const url = `https://api.open-meteo.com/v1/forecast?latitude=${city.lat}&longitude=${city.lng}`
+      + `&current=temperature_2m,weather_code,relative_humidity_2m,wind_speed_10m`
+      + `&daily=temperature_2m_max,temperature_2m_min,weather_code`
+      + `&timezone=Asia%2FTokyo&forecast_days=5`;
 
-      const forecastHtml = daily.time.map((dateStr, i) => {
-        const [icon] = weatherInfo(daily.weather_code[i]);
-        const label = i === 0 ? "Aujourd'hui" : DAY_LABELS[new Date(dateStr).getDay()];
-        return `
-          <div class="weather-live-day">
-            <div class="weather-live-day-label">${label}</div>
-            <div class="weather-live-day-icon">${icon}</div>
-            <div class="weather-live-day-temps">
-              <span class="max">${Math.round(daily.temperature_2m_max[i])}°</span>
-              <span class="min">${Math.round(daily.temperature_2m_min[i])}°</span>
+    fetch(url)
+      .then(res => res.json())
+      .then(data => {
+        const current = data.current;
+        const daily = data.daily;
+        const [curIcon, curDesc] = weatherInfo(current.weather_code);
+
+        const forecastHtml = daily.time.map((dateStr, i) => {
+          const [icon] = weatherInfo(daily.weather_code[i]);
+          const label = i === 0 ? "Aujourd'hui" : DAY_LABELS[new Date(dateStr).getDay()];
+          return `
+            <div class="weather-live-day">
+              <div class="weather-live-day-label">${label}</div>
+              <div class="weather-live-day-icon">${icon}</div>
+              <div class="weather-live-day-temps">
+                <span class="max">${Math.round(daily.temperature_2m_max[i])}°</span>
+                <span class="min">${Math.round(daily.temperature_2m_min[i])}°</span>
+              </div>
+            </div>`;
+        }).join('');
+
+        const now = new Date();
+        const updatedStr = now.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
+
+        el.innerHTML = `
+          <div class="weather-live-current">
+            <div class="weather-live-icon">${curIcon}</div>
+            <div>
+              <div class="weather-live-temp">${Math.round(current.temperature_2m)}°C</div>
+              <div class="weather-live-desc">${curDesc}</div>
             </div>
-          </div>`;
-      }).join('');
-
-      const now = new Date();
-      const updatedStr = now.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
-
-      el.innerHTML = `
-        <div class="weather-live-current">
-          <div class="weather-live-icon">${curIcon}</div>
-          <div>
-            <div class="weather-live-temp">${Math.round(current.temperature_2m)}°C</div>
-            <div class="weather-live-desc">${curDesc}</div>
+            <div class="weather-live-meta">
+              <span>💧 ${current.relative_humidity_2m}%</span>
+              <span>💨 ${Math.round(current.wind_speed_10m)} km/h</span>
+            </div>
           </div>
-          <div class="weather-live-meta">
-            <span>💧 ${current.relative_humidity_2m}%</span>
-            <span>💨 ${Math.round(current.wind_speed_10m)} km/h</span>
-          </div>
-        </div>
-        <div class="weather-live-forecast">${forecastHtml}</div>
-        <p class="weather-live-updated">Mis à jour à ${updatedStr} (heure du Japon)</p>
-      `;
-    })
-    .catch(() => {
-      el.innerHTML = '<p class="weather-live-error">Impossible de charger la météo pour le moment.</p>';
-    });
+          <div class="weather-live-forecast">${forecastHtml}</div>
+          <p class="weather-live-updated">Mis à jour à ${updatedStr} (heure du Japon)</p>
+        `;
+      })
+      .catch(() => {
+        el.innerHTML = '<p class="weather-live-error">Impossible de charger la météo pour le moment.</p>';
+      });
+  }
+
+  if (citySelect) {
+    citySelect.addEventListener('change', () => loadWeather(citySelect.value));
+  }
+  loadWeather(citySelect ? citySelect.value : 'yonezawa');
 })();
 
 // Speak Japanese phrases aloud (Web Speech API)

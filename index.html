@@ -22,7 +22,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;700&family=Zen+Maru+Gothic:wght@400;500;700&display=swap">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
-<link rel="stylesheet" href="style.css?v=48">
+<link rel="stylesheet" href="style.css?v=49">
 </head>
 <body>
 
@@ -375,37 +375,18 @@
 
     <div class="card-grid">
       <div class="card wide reveal">
-        <h3>🌡️ Tokyo en septembre</h3>
-        <div class="table-scroll">
-          <table class="weather-table">
-            <thead>
-              <tr>
-                <th>Ensoleillement (h/j)</th>
-                <th>T° moyenne min (°C)</th>
-                <th>T° moyenne max (°C)</th>
-                <th>T° record min (°C)</th>
-                <th>T° record max (°C)</th>
-                <th>Précipitations (mm)</th>
-                <th>Jours de pluie</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>5</td>
-                <td>20</td>
-                <td>27</td>
-                <td>11</td>
-                <td>35</td>
-                <td>233</td>
-                <td>12</td>
-              </tr>
-            </tbody>
-          </table>
+        <div class="weather-live-header">
+          <h3>☁️ Météo en direct</h3>
+          <select class="weather-city-select" id="weatherCitySelect">
+            <option value="yonezawa">Yonezawa</option>
+            <option value="tokyo">Tokyo</option>
+            <option value="kyoto">Kyoto</option>
+            <option value="fujikawaguchiko">Fujikawaguchiko</option>
+            <option value="sendai">Sendai</option>
+            <option value="niigata">Niigata</option>
+            <option value="tsuruoka">Tsuruoka</option>
+          </select>
         </div>
-      </div>
-
-      <div class="card wide reveal">
-        <h3>☁️ Météo en direct à Yonezawa</h3>
         <div class="weather-live" id="weatherLive">
           <p class="weather-live-loading">Chargement de la météo...</p>
         </div>
@@ -594,6 +575,6 @@
 </main>
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
-<script src="script.js?v=32"></script>
+<script src="script.js?v=33"></script>
 </body>
 </html>

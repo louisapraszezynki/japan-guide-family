@@ -16,6 +16,14 @@ const ICLOUD_PHOTOS_CACHE_SECONDS = 300; // 5 min: browsers can't call Apple's A
 // directly (no CORS headers), so this proxies + caches it to stay fast and
 // avoid hammering Apple's servers on every page load.
 
+// Temporary: select this in the function dropdown (no trailing "_" so it's
+// visible there, unlike the private helpers) and click Run. It should pop
+// up the permissions screen the first time. Delete once photos work.
+function testUrlFetch() {
+  const resp = UrlFetchApp.fetch('https://www.google.com');
+  Logger.log(resp.getResponseCode());
+}
+
 function getSheet_() {
   const ss = SpreadsheetApp.getActiveSpreadsheet();
   let sheet = ss.getSheetByName(SHEET_NAME);

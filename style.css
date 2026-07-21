@@ -262,9 +262,6 @@ html.trip-started .section-num::before{content:attr(data-after);}
 @media (max-width:640px){
   .hero-intro-group{left:50%; top:46%;}
 }
-@media (prefers-reduced-motion: reduce){
-  .hero-intro{display:none;}
-}
 
 /* ---------- cards ---------- */
 .card-grid{

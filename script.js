@@ -19,7 +19,8 @@ document.querySelectorAll('.image-placeholder[data-slot]').forEach(el => {
   const groupEl = document.getElementById('heroIntroGroup');
   const heroEl = document.getElementById('hero');
   if (!introEl || !groupEl || !heroEl) return;
-  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  const forceAnim = new URLSearchParams(location.search).get('anim') === '1';
+  if (!forceAnim && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
 
   let dismissed = false;
   let grouped = false;

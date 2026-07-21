@@ -197,13 +197,17 @@ html.trip-started .section-num::before{content:attr(data-after);}
   /* Fixed (not absolute) so it centers on the actual viewport rather than
      on .hero's own box, which is often taller than the visible screen
      (min-height:100svh plus its padding/content can exceed that), which
-     was pushing the map below the fold on load. */
+     was pushing the map below the fold on load. Flexbox centering for the
+     map (rather than top/left/transform math) is the more robust of the
+     two ways to center a box and avoids any dependency on this element
+     having a reliably-computed height in every browser. */
   position:fixed; inset:0; z-index:5; background:var(--paper);
   overflow:hidden; opacity:1; transition:opacity .6s ease;
+  display:flex; align-items:center; justify-content:center;
 }
 .hero-intro.dismissed{opacity:0; pointer-events:none;}
 .hero-intro-map.image-placeholder{
-  position:absolute; left:50%; top:50%; transform:translate(-50%,-50%);
+  position:static; flex:none;
   width:min(90vw, 620px); height:min(90vh, 620px);
   border:none; background-color:transparent; background-image:none; min-height:0;
   background-size:contain; background-repeat:no-repeat; background-position:center;

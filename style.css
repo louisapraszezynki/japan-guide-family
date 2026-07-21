@@ -478,6 +478,36 @@ html.trip-started .section-num::before{content:attr(data-after);}
 .weather-table th{color:var(--ink-soft); font-weight:600; font-size:.78rem; letter-spacing:.02em;}
 .weather-table td{font-size:1.25rem; font-weight:700; color:var(--vermillion);}
 
+/* ---------- live weather (Open-Meteo) ---------- */
+.weather-live-loading, .weather-live-error{color:var(--ink-soft); font-size:.9rem;}
+.weather-live-current{
+  display:flex; align-items:center; gap:20px; flex-wrap:wrap;
+  padding:20px 24px; margin-bottom:20px;
+  background:var(--paper-alt); border-radius:var(--radius);
+}
+.section.alt .weather-live-current{background:var(--paper);}
+.weather-live-icon{font-size:2.8rem; line-height:1;}
+.weather-live-temp{font-size:2.4rem; font-weight:700; color:var(--vermillion); line-height:1;}
+.weather-live-desc{color:var(--ink-soft); font-size:.9rem; margin-top:4px;}
+.weather-live-meta{display:flex; gap:16px; margin-left:auto; font-size:.85rem; color:var(--ink-soft);}
+.weather-live-forecast{
+  display:grid; grid-template-columns:repeat(auto-fit, minmax(90px, 1fr)); gap:10px;
+}
+.weather-live-day{
+  text-align:center; padding:14px 8px; border-radius:12px; background:var(--paper-alt);
+}
+.section.alt .weather-live-day{background:var(--paper);}
+.weather-live-day-label{font-size:.78rem; color:var(--ink-soft); margin-bottom:6px; text-transform:capitalize;}
+.weather-live-day-icon{font-size:1.5rem; margin-bottom:4px;}
+.weather-live-day-temps{font-size:.85rem; font-weight:600;}
+.weather-live-day-temps .max{color:var(--vermillion);}
+.weather-live-day-temps .min{color:var(--ink-soft); font-weight:400;}
+.weather-live-updated{font-size:.72rem; color:var(--ink-soft); margin-top:14px; text-align:right;}
+@media (max-width:500px){
+  .weather-live-current{gap:14px; padding:16px;}
+  .weather-live-meta{margin-left:0; width:100%;}
+}
+
 .phrase-table{
   width:100%; border-collapse:collapse; margin:16px 0; font-size:.92rem;
 }

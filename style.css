@@ -82,12 +82,65 @@ a{color:var(--vermillion);}
 .section.alt > *{max-width:1080px; margin-left:auto; margin-right:auto; padding-left:24px; padding-right:24px;}
 .section.alt{padding-top:120px; padding-bottom:120px;}
 
+/* ---------- section order (swaps once the trip starts, see the inline
+   script in <head> which sets .trip-started before first paint so
+   there's no visible reflow) ---------- */
+main{display:flex; flex-direction:column;}
+#hero{order:0;}
+#planning{order:1;}
+#geographie{order:2;}
+#culture{order:3;}
+#climat{order:4;}
+#administratif{order:5;}
+#transports{order:6;}
+#infos-utiles{order:7;}
+#photos{order:8;}
+main > .footer{order:9;}
+
+html.trip-started #photos{order:2;}
+html.trip-started #climat{order:3;}
+html.trip-started #geographie{order:4;}
+html.trip-started #culture{order:5;}
+html.trip-started #transports{order:6;}
+html.trip-started #administratif{order:7;}
+html.trip-started #infos-utiles{order:8;}
+
+/* Keep the alternating light/dark background stripe correct in the new
+   order too (Climat swaps from "alt" to plain, Infos utiles the reverse). */
+html.trip-started #climat{background:var(--paper);}
+html.trip-started #infos-utiles{
+  max-width:none; padding-left:0; padding-right:0; background:var(--paper-alt);
+}
+html.trip-started #infos-utiles > *{
+  max-width:1080px; margin-left:auto; margin-right:auto; padding-left:24px; padding-right:24px;
+}
+
+.dot-nav a[href="#hero"]{order:0;}
+.dot-nav a[href="#planning"]{order:1;}
+.dot-nav a[href="#geographie"]{order:2;}
+.dot-nav a[href="#culture"]{order:3;}
+.dot-nav a[href="#climat"]{order:4;}
+.dot-nav a[href="#administratif"]{order:5;}
+.dot-nav a[href="#transports"]{order:6;}
+.dot-nav a[href="#infos-utiles"]{order:7;}
+.dot-nav a[href="#photos"]{order:8;}
+
+html.trip-started .dot-nav a[href="#photos"]{order:2;}
+html.trip-started .dot-nav a[href="#climat"]{order:3;}
+html.trip-started .dot-nav a[href="#geographie"]{order:4;}
+html.trip-started .dot-nav a[href="#culture"]{order:5;}
+html.trip-started .dot-nav a[href="#transports"]{order:6;}
+html.trip-started .dot-nav a[href="#administratif"]{order:7;}
+html.trip-started .dot-nav a[href="#infos-utiles"]{order:8;}
+
 .section-head{max-width:var(--max-w); margin-bottom:56px;}
 .section-num{
   display:inline-block; font-family:'Shippori Mincho', serif;
   color:var(--vermillion); font-size:.95rem; letter-spacing:.15em;
   border-bottom:1px solid var(--vermillion); padding-bottom:4px; margin-bottom:14px;
 }
+.section-num::before{content:attr(data-before);}
+html.trip-started .section-num::before{content:attr(data-after);}
 .section-head h2{font-size:clamp(1.8rem, 3.5vw, 2.6rem); margin-bottom:14px;}
 .section-intro{color:var(--ink-soft); font-size:1.05rem; max-width:60ch;}
 

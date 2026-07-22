@@ -341,6 +341,15 @@ html.trip-started .section-num::before{content:attr(data-after);}
 .section.alt .card .note{background:var(--paper);}
 .card .address{font-family:monospace; font-size:.95rem; background:var(--paper-alt); padding:10px 14px; border-radius:8px; margin-bottom:10px; color:var(--ink);}
 
+.card-link{
+  display:block; text-decoration:none; color:inherit;
+  border-color:var(--vermillion-soft);
+}
+.card-link-cta{
+  display:inline-block; margin-top:4px; color:var(--vermillion); font-weight:600; font-size:.92rem;
+}
+.card-link:hover .card-link-cta{text-decoration:underline;}
+
 .note-with-media{
   display:flex; gap:24px; align-items:center; margin-top:16px;
 }

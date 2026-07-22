@@ -31,11 +31,23 @@ function renderIdentityAvatar(){
   const avatar = document.getElementById('identityAvatar');
   const inner = document.getElementById('identityAvatarInner');
   if (!avatar || !inner) return;
+  // Set every background-* longhand explicitly on every call, never the
+  // `background` shorthand — assigning the shorthand resets sibling
+  // longhands like background-size/position to their initial values on
+  // the inline style, so a later call that only touches backgroundImage
+  // would inherit a stale "auto / 0 0" instead of the stylesheet's
+  // center/cover, rendering the photo zoomed into its top-left corner.
+  function setAvatarBg(color, image){
+    avatar.style.backgroundColor = color;
+    avatar.style.backgroundImage = image;
+    avatar.style.backgroundSize = 'cover';
+    avatar.style.backgroundPosition = 'center';
+    avatar.style.backgroundRepeat = 'no-repeat';
+  }
   const name = getFamilyName();
   if (!name) {
     avatar.classList.remove('has-photo');
-    avatar.style.backgroundImage = 'none';
-    avatar.style.background = 'var(--indigo)';
+    setAvatarBg('var(--indigo)', 'none');
     inner.textContent = '+';
     avatar.setAttribute('aria-label', 'Indiquer votre prénom');
     return;
@@ -44,14 +56,13 @@ function renderIdentityAvatar(){
   avatar.setAttribute('aria-label', `${name} — cliquer pour changer`);
   if (face) {
     avatar.classList.add('has-photo');
-    avatar.style.backgroundImage = `url("${face.img}")`;
+    setAvatarBg('var(--indigo)', `url("${face.img}")`);
     inner.textContent = '';
   } else {
     // Unrecognized name (not Louisa/Maman/Mathieu): a "?" rather than a
     // colored initial, since this isn't a real family member profile.
     avatar.classList.remove('has-photo');
-    avatar.style.backgroundImage = 'none';
-    avatar.style.background = 'var(--ink-soft)';
+    setAvatarBg('var(--ink-soft)', 'none');
     inner.textContent = '?';
   }
 }

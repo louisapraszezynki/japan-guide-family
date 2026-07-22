@@ -742,10 +742,17 @@ html.trip-started .section-num::before{content:attr(data-after);}
 }
 .backlog-list{flex:1; overflow-y:auto; display:flex; flex-direction:column; gap:8px; margin-bottom:12px; min-height:0;}
 .backlog-item{
-  display:flex; align-items:center; justify-content:space-between; gap:8px;
+  display:flex; align-items:center; gap:8px;
   background:var(--paper-alt); border-radius:8px; padding:8px 10px; font-size:.88rem; color:var(--ink);
 }
 .section.alt .backlog-item{background:var(--paper);}
+.backlog-item-text{flex:1; min-width:0;}
+.backlog-avatar{
+  flex:none; width:22px; height:22px; border-radius:50%;
+  display:flex; align-items:center; justify-content:center;
+  background:var(--ink-soft) center/cover no-repeat; color:#fff; font-size:.68rem; font-weight:700;
+}
+.backlog-avatar.has-photo{color:transparent;}
 .backlog-item-delete{
   width:20px; height:20px; flex:none; border-radius:50%; border:none; background:var(--paper);
   color:var(--ink-soft); font-size:.68rem; cursor:pointer;

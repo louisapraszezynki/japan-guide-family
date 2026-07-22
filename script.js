@@ -11,19 +11,11 @@ const FAMILY_FACES = {
   emmanuelle: { img: 'images/maman.png', label: 'Maman' },
   mathieu: { img: 'images/mathieu.png', label: 'Mathieu' },
 };
-const IDENTITY_COLORS = ['var(--vermillion)', 'var(--indigo)', 'var(--gold)', 'var(--vermillion-soft)', 'var(--indigo-deep)'];
-
 function normalizeName_(str){
   return (str || '').trim().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
 }
 function resolveFace(name){
   return FAMILY_FACES[normalizeName_(name)] || null;
-}
-function nameColor_(name){
-  const str = normalizeName_(name);
-  let hash = 0;
-  for (let i = 0; i < str.length; i++) hash = (hash * 31 + str.charCodeAt(i)) >>> 0;
-  return IDENTITY_COLORS[hash % IDENTITY_COLORS.length];
 }
 function getFamilyName(){
   return localStorage.getItem('familyName') || '';
@@ -55,10 +47,12 @@ function renderIdentityAvatar(){
     avatar.style.backgroundImage = `url("${face.img}")`;
     inner.textContent = '';
   } else {
+    // Unrecognized name (not Louisa/Maman/Mathieu): a "?" rather than a
+    // colored initial, since this isn't a real family member profile.
     avatar.classList.remove('has-photo');
     avatar.style.backgroundImage = 'none';
-    avatar.style.background = nameColor_(name);
-    inner.textContent = name.charAt(0).toUpperCase();
+    avatar.style.background = 'var(--ink-soft)';
+    inner.textContent = '?';
   }
 }
 // Exposed so other features (the checklist) can ask for a name too, when
@@ -854,9 +848,13 @@ function makeCrossDaySortable(containers, onReorder, onMove, onDragStateChange){
       backlogList.innerHTML = '<p class="backlog-empty">Aucune idée pour l\'instant.</p>';
       return;
     }
-    backlogList.innerHTML = items.map(item =>
-      `<div class="backlog-item"><span>${escapeHtml(item.text)}</span><button type="button" class="backlog-item-delete" data-id="${item.id}" aria-label="Supprimer">✕</button></div>`
-    ).join('');
+    backlogList.innerHTML = items.map(item => {
+      const face = resolveFace(item.name);
+      const avatar = face
+        ? `<span class="backlog-avatar has-photo" style="background-image:url('${face.img}')" title="${escapeHtml(face.label)}"></span>`
+        : `<span class="backlog-avatar" title="${escapeHtml(item.name || 'Inconnu')}">?</span>`;
+      return `<div class="backlog-item">${avatar}<span class="backlog-item-text">${escapeHtml(item.text)}</span><button type="button" class="backlog-item-delete" data-id="${item.id}" aria-label="Supprimer">✕</button></div>`;
+    }).join('');
   }
 
   if (backlogList) {
@@ -883,16 +881,17 @@ function makeCrossDaySortable(containers, onReorder, onMove, onDragStateChange){
       e.preventDefault();
       const text = backlogInput.value.trim();
       if (!text || !isConfigured()) return;
+      const name = getFamilyName();
       const submitBtn = backlogForm.querySelector('button');
       submitBtn.disabled = true;
       fetch(DAY_PLANNER_CONFIG.apiUrl, {
         method: 'POST',
-        body: JSON.stringify({ action: 'add', date: '', name: '', category: '', emoji: '', text }),
+        body: JSON.stringify({ action: 'add', date: '', name, category: '', emoji: '', text }),
       })
         .then(res => res.json())
         .then(result => {
           if (!result || !result.success) throw new Error('add failed');
-          allEntries.push({ id: result.id, date: '', name: '', category: '', emoji: '', text, order: result.order });
+          allEntries.push({ id: result.id, date: '', name, category: '', emoji: '', text, order: result.order });
           renderBacklog();
           backlogInput.value = '';
           backlogForm.hidden = true;
@@ -1169,7 +1168,7 @@ function makeCrossDaySortable(containers, onReorder, onMove, onDragStateChange){
 
   function loadChecklist(){
     const name = getFamilyName();
-    if (!name || !apiUrl) { items = {}; applyState(); return Promise.resolve(); }
+    if (!name || !apiUrl || !resolveFace(name)) { items = {}; applyState(); return Promise.resolve(); }
     return fetch(`${apiUrl}?type=checklist&name=${encodeURIComponent(name)}&_=${Date.now()}`)
       .then(res => res.json())
       .then(data => { items = data.items || {}; applyState(); })
@@ -1178,7 +1177,10 @@ function makeCrossDaySortable(containers, onReorder, onMove, onDragStateChange){
 
   function saveChecklist(){
     const name = getFamilyName();
-    if (!name || !apiUrl) return;
+    // Only persist for a recognized family member (Louisa/Maman/Mathieu) —
+    // an unrecognized name still gets visual feedback for the session, but
+    // isn't worth cluttering the shared Checklist sheet with.
+    if (!name || !apiUrl || !resolveFace(name)) return;
     fetch(apiUrl, {
       method: 'POST',
       body: JSON.stringify({ action: 'saveChecklist', name, items }),

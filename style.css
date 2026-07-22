@@ -362,6 +362,7 @@ html.trip-started .section-num::before{content:attr(data-after);}
   display:inline-block; margin-top:4px; color:var(--vermillion); font-weight:600; font-size:.92rem;
 }
 .card-link:hover .card-link-cta{text-decoration:underline;}
+.card-centered{grid-column:1 / -1; justify-self:center; width:100%; max-width:500px;}
 
 .note-with-media{
   display:flex; gap:24px; align-items:center; margin-top:16px;

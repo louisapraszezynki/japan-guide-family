@@ -1,3 +1,94 @@
+// ---------- Family identity (who's using the site right now) ----------
+// No real login: just a name typed once and remembered via localStorage
+// (key 'familyName', shared with the day planner's "Prénom" field, which
+// already persisted it before this existed). Shows a small face avatar
+// for known family members, fixed in the top-right corner, so later
+// features (favorites, personal checklists...) can recognize a visitor
+// without asking again every visit.
+const FAMILY_FACES = {
+  louisa: { img: 'images/louisa.png', label: 'Louisa' },
+  maman: { img: 'images/maman.png', label: 'Maman' },
+  emmanuelle: { img: 'images/maman.png', label: 'Maman' },
+  mathieu: { img: 'images/mathieu.png', label: 'Mathieu' },
+};
+const IDENTITY_COLORS = ['var(--vermillion)', 'var(--indigo)', 'var(--gold)', 'var(--vermillion-soft)', 'var(--indigo-deep)'];
+
+function normalizeName_(str){
+  return (str || '').trim().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+}
+function resolveFace(name){
+  return FAMILY_FACES[normalizeName_(name)] || null;
+}
+function nameColor_(name){
+  const str = normalizeName_(name);
+  let hash = 0;
+  for (let i = 0; i < str.length; i++) hash = (hash * 31 + str.charCodeAt(i)) >>> 0;
+  return IDENTITY_COLORS[hash % IDENTITY_COLORS.length];
+}
+function getFamilyName(){
+  return localStorage.getItem('familyName') || '';
+}
+function setFamilyName(name){
+  const trimmed = (name || '').trim();
+  if (!trimmed) return;
+  localStorage.setItem('familyName', trimmed);
+  renderIdentityAvatar();
+}
+function renderIdentityAvatar(){
+  const avatar = document.getElementById('identityAvatar');
+  const inner = document.getElementById('identityAvatarInner');
+  if (!avatar || !inner) return;
+  const name = getFamilyName();
+  if (!name) {
+    avatar.classList.remove('has-photo');
+    avatar.style.backgroundImage = 'none';
+    avatar.style.background = 'var(--indigo)';
+    inner.textContent = '+';
+    avatar.setAttribute('aria-label', 'Indiquer votre prénom');
+    return;
+  }
+  const face = resolveFace(name);
+  avatar.setAttribute('aria-label', `${name} — cliquer pour changer`);
+  if (face) {
+    avatar.classList.add('has-photo');
+    avatar.style.backgroundImage = `url("${face.img}")`;
+    inner.textContent = '';
+  } else {
+    avatar.classList.remove('has-photo');
+    avatar.style.backgroundImage = 'none';
+    avatar.style.background = nameColor_(name);
+    inner.textContent = name.charAt(0).toUpperCase();
+  }
+}
+(function initIdentity(){
+  const avatar = document.getElementById('identityAvatar');
+  const modal = document.getElementById('identityModal');
+  const form = document.getElementById('identityForm');
+  const input = document.getElementById('identityInput');
+  if (!avatar || !modal || !form || !input) return;
+
+  function openModal(){
+    input.value = getFamilyName();
+    modal.hidden = false;
+    input.focus();
+  }
+  function closeModal(){ modal.hidden = true; }
+
+  avatar.addEventListener('click', openModal);
+  avatar.addEventListener('keydown', e => {
+    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openModal(); }
+  });
+  modal.addEventListener('click', e => { if (e.target === modal) closeModal(); });
+  form.addEventListener('submit', e => {
+    e.preventDefault();
+    setFamilyName(input.value);
+    closeModal();
+  });
+
+  renderIdentityAvatar();
+  if (!getFamilyName()) openModal();
+})();
+
 // Auto-swap image placeholders for real photos, if present
 document.querySelectorAll('.image-placeholder[data-slot]').forEach(el => {
   const src = el.getAttribute('data-slot');
@@ -889,7 +980,7 @@ function makeCrossDaySortable(containers, onReorder, onMove, onDragStateChange){
 
     const label = new Date(dateStr + 'T00:00:00').toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' });
     titleEl.textContent = label.charAt(0).toUpperCase() + label.slice(1);
-    const savedName = localStorage.getItem('familyName');
+    const savedName = getFamilyName();
     if (savedName) nameInput.value = savedName;
     categoryInput.value = '';
     resetEmojiPicker();
@@ -939,7 +1030,7 @@ function makeCrossDaySortable(containers, onReorder, onMove, onDragStateChange){
     if (!category) { formStatus.textContent = 'Merci de choisir une catégorie.'; return; }
     if (!emoji) { formStatus.textContent = 'Choisissez un émoji pour cette catégorie.'; return; }
     if (!text) { formStatus.textContent = 'Merci de décrire votre idée.'; return; }
-    localStorage.setItem('familyName', name);
+    setFamilyName(name);
 
     const submitBtn = form.querySelector('button');
     submitBtn.disabled = true;

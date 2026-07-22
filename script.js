@@ -105,14 +105,16 @@ let promptForIdentity = function(){};
   if (!getFamilyName()) openModal();
 })();
 
-// Curved-arrow hint pointing at the avatar, only while no name is set yet
-// and only near the very top of the page (hidden once you've scrolled
-// past the hero/intro, e.g. once section 01 comes into view).
+// Curved-arrow hint pointing at the avatar, while no name is set yet OR
+// the name set isn't a recognized family member, and only near the very
+// top of the page (hidden once you've scrolled past the hero/intro, e.g.
+// once section 01 comes into view).
 (function initIdentityHint(){
   const hint = document.getElementById('identityHint');
   if (!hint) return;
   function update(){
-    const shouldShow = !getFamilyName() && window.scrollY < 80;
+    const name = getFamilyName();
+    const shouldShow = (!name || !resolveFace(name)) && window.scrollY < 80;
     hint.classList.toggle('hidden', !shouldShow);
   }
   window.addEventListener('scroll', update, { passive: true });
@@ -304,8 +306,8 @@ document.querySelectorAll('.image-placeholder[data-slot]').forEach(el => {
       interactive: false,
     }).addTo(map);
   }
-  zoneLabel(34.3, 135.8, '☀️ Encore chaud fin septembre');
-  zoneLabel(39.1, 140.3, '❄️ Se rafraîchit dès mi-septembre');
+  zoneLabel(34.3, 135.8, '☀️ Encore chaud fin septembre (~23°C / 29°C)');
+  zoneLabel(39.1, 140.3, '❄️ Se rafraîchit dès mi-septembre (~19°C / 27°C)');
 
   function pinIcon(emoji){
     return L.divIcon({

@@ -91,8 +91,8 @@ main{display:flex; flex-direction:column;}
 #geographie{order:2;}
 #culture{order:3;}
 #climat{order:4;}
-#administratif{order:5;}
-#transports{order:6;}
+#transports{order:5;}
+#administratif{order:6;}
 #infos-utiles{order:7;}
 #photos{order:8;}
 main > .footer{order:9;}
@@ -105,13 +105,26 @@ html.trip-started #transports{order:6;}
 html.trip-started #administratif{order:7;}
 html.trip-started #infos-utiles{order:8;}
 
-/* Keep the alternating light/dark background stripe correct in the new
-   order too (Climat swaps from "alt" to plain, Infos utiles the reverse). */
+/* Keep the alternating light/dark background stripe correct in every
+   order. Transports/Administratif swapped which one is "alt" (Transports
+   is naturally alt, Administratif plain) to fix the default order's
+   zebra; the trip-started order needs the opposite recoloring here to
+   keep its own zebra intact (mirrors the Climat/Infos-utiles trick
+   below: a full-bleed band colored to match the page background reads
+   identically to a normal boxed section, so recoloring alone is enough
+   when the section is already full-bleed). */
 html.trip-started #climat{background:var(--paper);}
 html.trip-started #infos-utiles{
   max-width:none; padding-left:0; padding-right:0; background:var(--paper-alt);
 }
 html.trip-started #infos-utiles > *{
+  max-width:1080px; margin-left:auto; margin-right:auto; padding-left:24px; padding-right:24px;
+}
+html.trip-started #administratif{background:var(--paper);}
+html.trip-started #transports{
+  max-width:none; padding-left:0; padding-right:0; background:var(--paper-alt);
+}
+html.trip-started #transports > *{
   max-width:1080px; margin-left:auto; margin-right:auto; padding-left:24px; padding-right:24px;
 }
 
@@ -120,8 +133,8 @@ html.trip-started #infos-utiles > *{
 .dot-nav a[href="#geographie"]{order:2;}
 .dot-nav a[href="#culture"]{order:3;}
 .dot-nav a[href="#climat"]{order:4;}
-.dot-nav a[href="#administratif"]{order:5;}
-.dot-nav a[href="#transports"]{order:6;}
+.dot-nav a[href="#transports"]{order:5;}
+.dot-nav a[href="#administratif"]{order:6;}
 .dot-nav a[href="#infos-utiles"]{order:7;}
 .dot-nav a[href="#photos"]{order:8;}
 
@@ -159,7 +172,7 @@ html.trip-started .section-num::before{content:attr(data-after);}
 }
 .hero-reveal.in-view{opacity:1; transform:translateY(0) scale(1);}
 .kicker{
-  color:var(--vermillion); font-size:.85rem; letter-spacing:.15em; margin-bottom:18px;
+  color:var(--ink); font-size:.85rem; letter-spacing:.15em; margin-bottom:18px;
 }
 .hero h1{
   font-size:clamp(2.2rem, 5vw, 3.4rem); line-height:1.25; margin-bottom:22px;
@@ -443,6 +456,14 @@ html.trip-started .section-num::before{content:attr(data-after);}
 }
 .price-table th{color:var(--ink-soft); font-weight:600;}
 .price-table td:last-child, .price-table th:last-child{text-align:right;}
+
+.climate-table{width:100%; border-collapse:collapse; margin:16px 0; font-size:.95rem;}
+.climate-table th, .climate-table td{
+  text-align:left; padding:10px 14px; border-bottom:1px solid var(--line);
+}
+.climate-table th{color:var(--ink-soft); font-weight:600;}
+.climate-table td:not(:first-child), .climate-table th:not(:first-child){text-align:right;}
+.climate-table td:first-child{font-weight:600;}
 
 .reco-list{columns:2; column-gap:44px;}
 .reco{break-inside:avoid; margin-bottom:40px;}

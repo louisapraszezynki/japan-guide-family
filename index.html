@@ -22,7 +22,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;700&family=Zen+Maru+Gothic:wght@400;500;700&display=swap">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
-<link rel="stylesheet" href="style.css?v=54">
+<link rel="stylesheet" href="style.css?v=55">
 </head>
 <body>
 
@@ -47,7 +47,7 @@
     <div class="waves"></div>
     <div class="hero-content hero-reveal">
       <p class="kicker">プラゼザンキ家の日本旅行</p>
-      <h1><span class="accent">Le carnet de voyage</span><br>de nos vacances<br>au Japon</h1>
+      <h1><span class="accent">Le carnet de voyage</span><br>de nos vacances<br><span class="accent">au Japon</span></h1>
       <p class="hero-sub">Bienvenue dans ce guide de préparation pour votre voyage au Japon !</p>
       <a href="#planning" class="scroll-cue">
         <span>Commencer la lecture</span>
@@ -392,6 +392,24 @@
         </div>
       </div>
 
+      <div class="card wide reveal">
+        <h3>📉 Tendances par région en septembre</h3>
+        <p>Moyennes des températures (min / max quotidiennes) observées en septembre ces 3 dernières années, du sud (encore très chaud) au nord (qui se rafraîchit plus tôt) :</p>
+        <table class="climate-table">
+          <thead><tr><th>Ville</th><th>T° min moy.</th><th>T° max moy.</th></tr></thead>
+          <tbody>
+            <tr><td>Kyoto</td><td>22°C</td><td>30°C</td></tr>
+            <tr><td>Tokyo</td><td>23°C</td><td>29°C</td></tr>
+            <tr><td>Niigata</td><td>22°C</td><td>28°C</td></tr>
+            <tr><td>Tsuruoka</td><td>19°C</td><td>27°C</td></tr>
+            <tr><td>Yonezawa</td><td>19°C</td><td>27°C</td></tr>
+            <tr><td>Sendai</td><td>19°C</td><td>26°C</td></tr>
+            <tr><td>Fujikawaguchiko</td><td>18°C</td><td>25°C</td></tr>
+          </tbody>
+        </table>
+        <p class="note">🌀 Début septembre reste chaud et humide partout (encore proche de l'été, et c'est le pic de la saison des typhons). La baisse se fait surtout sentir en fin de mois, et plus nettement dans le Tohoku (Yonezawa, Sendai, Tsuruoka) qu'à Tokyo : entre le 1er et le 30 septembre, les nuits à Yonezawa perdent en moyenne près de 5°C, contre à peine 3-4°C à Tokyo.</p>
+      </div>
+
       <div class="card reveal">
         <h3>👕 Vêtements importants</h3>
         <ul>
@@ -414,10 +432,58 @@
     </div>
   </section>
 
-  <!-- ADMINISTRATIF -->
-  <section id="administratif" class="section">
+  <!-- TRANSPORTS -->
+  <section id="transports" class="section">
     <div class="section-head reveal">
-      <span class="section-num" data-before="05" data-after="07"></span>
+      <span class="section-num" data-before="05" data-after="06"></span>
+      <h2>Les transports</h2>
+      <p class="section-intro">Shinkansen, métro, voiture : comment se déplacer une fois sur place.</p>
+    </div>
+
+    <div class="image-placeholder banner reveal" data-slot="images/transports.png">
+      <span class="ph-icon">🚄</span>
+      <span class="ph-label">Photo shinkansen / gare<br><small>images/transports.jpg</small></span>
+    </div>
+
+    <div class="card-grid">
+      <div class="card wide reveal">
+        <h3>🚄 Le Shinkansen</h3>
+        <p>Pour voyager en Shinkansen (l'équivalent du TGV) à travers le Japon, certaines lignes ont des sites de réservation en ligne, d'autres non : certains billets s'achètent donc directement en gare.</p>
+        <p>Vous pouvez voyager debout même si les places assises sont épuisées, tant que le train comprend des wagons sans réservation : ce sont les <strong>« Non-reserved seats »</strong>.</p>
+        <p>Le prix des billets pour un même trajet est toujours le même, que vous réserviez 3 semaines à l'avance ou 30 minutes avant le départ.</p>
+      </div>
+
+      <div class="card wide reveal" id="suica">
+        <h3>🚇 Le métro & la carte Suica</h3>
+        <p>À Tokyo notamment, le métro est l'une des meilleures façons de se déplacer dans la ville.</p>
+        <p><strong>Carte de métro dématérialisée, la Suica :</strong></p>
+        <ol>
+          <li>Ouvrir l'application « Wallet » / « Cartes » sur iPhone</li>
+          <li>Cliquer sur le petit « + »</li>
+          <li>Sélectionner « Carte de transport » → « Japon » → « Suica »</li>
+          <li>Ajouter une nouvelle carte, puis la recharger directement avec votre carte bancaire</li>
+        </ol>
+        <p class="note">💡 Astuce : cette carte permet aussi d'y ajouter ses billets de Shinkansen, et de payer au konbini ou même parfois au restaurant !</p>
+      </div>
+
+      <div class="card reveal">
+        <h3>🚗 En voiture, Simone !</h3>
+        <p>Pour conduire, il faut faire traduire son permis français en permis japonais, faisable en ligne <a href="https://english.jaf.or.jp/driving-in-japan/drive-in-japan/switch-to-japanese-license" target="_blank" rel="noopener">ici</a> (il faut être au Japon pour le faire, mais un VPN fonctionne bien). Il faudra ensuite l'imprimer dans un konbini sur place.</p>
+      </div>
+
+      <div class="card calendar-card reveal">
+        <div class="image-placeholder voiture-image reveal" data-slot="images/voiture.jpeg">
+          <span class="ph-icon">🚗</span>
+          <span class="ph-label">Photo route / permis<br><small>images/voiture.jpg</small></span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ADMINISTRATIF -->
+  <section id="administratif" class="section alt">
+    <div class="section-head reveal">
+      <span class="section-num" data-before="06" data-after="07"></span>
       <h2>Administratif</h2>
       <p class="section-intro">Les démarches à faire avant le départ.</p>
     </div>
@@ -460,54 +526,6 @@
         <p>Pensez aussi à ajouter la carte de métro Suica à votre téléphone avant de partir, ça vous évitera de faire la queue aux bornes une fois sur place !</p>
         <span class="card-link-cta">Voir comment faire dans « Transports » →</span>
       </a>
-    </div>
-  </section>
-
-  <!-- TRANSPORTS -->
-  <section id="transports" class="section alt">
-    <div class="section-head reveal">
-      <span class="section-num" data-before="06" data-after="06"></span>
-      <h2>Les transports</h2>
-      <p class="section-intro">Shinkansen, métro, voiture : comment se déplacer une fois sur place.</p>
-    </div>
-
-    <div class="image-placeholder banner reveal" data-slot="images/transports.png">
-      <span class="ph-icon">🚄</span>
-      <span class="ph-label">Photo shinkansen / gare<br><small>images/transports.jpg</small></span>
-    </div>
-
-    <div class="card-grid">
-      <div class="card wide reveal">
-        <h3>🚄 Le Shinkansen</h3>
-        <p>Pour voyager en Shinkansen (l'équivalent du TGV) à travers le Japon, certaines lignes ont des sites de réservation en ligne, d'autres non : certains billets s'achètent donc directement en gare.</p>
-        <p>Vous pouvez voyager debout même si les places assises sont épuisées, tant que le train comprend des wagons sans réservation : ce sont les <strong>« Non-reserved seats »</strong>.</p>
-        <p>Le prix des billets pour un même trajet est toujours le même, que vous réserviez 3 semaines à l'avance ou 30 minutes avant le départ.</p>
-      </div>
-
-      <div class="card wide reveal" id="suica">
-        <h3>🚇 Le métro & la carte Suica</h3>
-        <p>À Tokyo notamment, le métro est l'une des meilleures façons de se déplacer dans la ville.</p>
-        <p><strong>Carte de métro dématérialisée, la Suica :</strong></p>
-        <ol>
-          <li>Ouvrir l'application « Wallet » / « Cartes » sur iPhone</li>
-          <li>Cliquer sur le petit « + »</li>
-          <li>Sélectionner « Carte de transport » → « Japon » → « Suica »</li>
-          <li>Ajouter une nouvelle carte, puis la recharger directement avec votre carte bancaire</li>
-        </ol>
-        <p class="note">💡 Astuce : cette carte permet aussi d'y ajouter ses billets de Shinkansen, et de payer au konbini ou même parfois au restaurant !</p>
-      </div>
-
-      <div class="card reveal">
-        <h3>🚗 En voiture, Simone !</h3>
-        <p>Pour conduire, il faut faire traduire son permis français en permis japonais, faisable en ligne <a href="https://english.jaf.or.jp/driving-in-japan/drive-in-japan/switch-to-japanese-license" target="_blank" rel="noopener">ici</a> (il faut être au Japon pour le faire, mais un VPN fonctionne bien). Il faudra ensuite l'imprimer dans un konbini sur place.</p>
-      </div>
-
-      <div class="card calendar-card reveal">
-        <div class="image-placeholder voiture-image reveal" data-slot="images/voiture.jpeg">
-          <span class="ph-icon">🚗</span>
-          <span class="ph-label">Photo route / permis<br><small>images/voiture.jpg</small></span>
-        </div>
-      </div>
     </div>
   </section>
 

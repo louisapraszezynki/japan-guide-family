@@ -8,6 +8,9 @@
 const SHEET_NAME = 'Entries';
 const HEADERS = ['ID', 'Date', 'Name', 'Category', 'Emoji', 'Text', 'Order', 'CreatedAt'];
 
+const CHECKLIST_SHEET_NAME = 'Checklist';
+const CHECKLIST_HEADERS = ['Name', 'ItemsJSON', 'UpdatedAt'];
+
 // The family iCloud Shared Album (public, read-only). Its token is the
 // part after "#" in the album's public link.
 const ICLOUD_ALBUM_TOKEN = 'B24JtdOXmKOo432';
@@ -34,6 +37,16 @@ function jsonResponse_(obj) {
   return ContentService.createTextOutput(JSON.stringify(obj)).setMimeType(ContentService.MimeType.JSON);
 }
 
+function getChecklistSheet_() {
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  let sheet = ss.getSheetByName(CHECKLIST_SHEET_NAME);
+  if (!sheet) {
+    sheet = ss.insertSheet(CHECKLIST_SHEET_NAME);
+    sheet.appendRow(CHECKLIST_HEADERS);
+  }
+  return sheet;
+}
+
 // Defensive: normalizes a cell value back to "YYYY-MM-DD" even if it was
 // already auto-converted to a real Date (e.g. rows written before the
 // plain-text fix above, or someone editing the sheet by hand).
@@ -50,6 +63,10 @@ function normalizeDate_(val) {
 function doGet(e) {
   if (e.parameter && e.parameter.type === 'photos') {
     return jsonResponse_({ photos: getIcloudPhotosCached_() });
+  }
+
+  if (e.parameter && e.parameter.type === 'checklist') {
+    return jsonResponse_({ items: getChecklistItems_(e.parameter.name || '') });
   }
 
   const sheet = getSheet_();
@@ -142,6 +159,46 @@ function fetchIcloudPhotos_() {
     .sort((a, b) => (b.dateCreated || '').localeCompare(a.dateCreated || ''));
 }
 
+// ---------- Personal checklist (per name, no real auth) ----------
+
+function normalizeChecklistName_(name) {
+  return (name || '').trim().toLowerCase();
+}
+
+function getChecklistItems_(name) {
+  const key = normalizeChecklistName_(name);
+  if (!key) return {};
+  const sheet = getChecklistSheet_();
+  const data = sheet.getDataRange().getValues();
+  for (let i = 1; i < data.length; i++) {
+    if (normalizeChecklistName_(data[i][0]) === key) {
+      try {
+        return JSON.parse(data[i][1] || '{}');
+      } catch (err) {
+        return {};
+      }
+    }
+  }
+  return {};
+}
+
+function saveChecklistItems_(name, items) {
+  const key = normalizeChecklistName_(name);
+  if (!key) return;
+  const sheet = getChecklistSheet_();
+  const data = sheet.getDataRange().getValues();
+  const itemsJson = JSON.stringify(items || {});
+  const now = new Date();
+  for (let i = 1; i < data.length; i++) {
+    if (normalizeChecklistName_(data[i][0]) === key) {
+      sheet.getRange(i + 1, 2).setValue(itemsJson);
+      sheet.getRange(i + 1, 3).setValue(now);
+      return;
+    }
+  }
+  sheet.appendRow([name.trim(), itemsJson, now]);
+}
+
 function doPost(e) {
   let body;
   try {
@@ -189,6 +246,11 @@ function doPost(e) {
         break;
       }
     }
+    return jsonResponse_({ success: true });
+  }
+
+  if (body.action === 'saveChecklist') {
+    saveChecklistItems_(body.name || '', body.items || {});
     return jsonResponse_({ success: true });
   }
 

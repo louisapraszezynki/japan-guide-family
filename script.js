@@ -33,6 +33,7 @@ function setFamilyName(name){
   if (!trimmed) return;
   localStorage.setItem('familyName', trimmed);
   renderIdentityAvatar();
+  document.dispatchEvent(new CustomEvent('familyNameChanged', { detail: { name: trimmed } }));
 }
 function renderIdentityAvatar(){
   const avatar = document.getElementById('identityAvatar');
@@ -60,6 +61,10 @@ function renderIdentityAvatar(){
     inner.textContent = name.charAt(0).toUpperCase();
   }
 }
+// Exposed so other features (the checklist) can ask for a name too, when
+// someone tries to use them before an identity has been set.
+let promptForIdentity = function(){};
+
 (function initIdentity(){
   const avatar = document.getElementById('identityAvatar');
   const modal = document.getElementById('identityModal');
@@ -67,14 +72,19 @@ function renderIdentityAvatar(){
   const input = document.getElementById('identityInput');
   if (!avatar || !modal || !form || !input) return;
 
-  function openModal(){
+  let onNameSet = null;
+
+  function openModal(callback){
+    onNameSet = callback || null;
     input.value = getFamilyName();
     modal.hidden = false;
     input.focus();
   }
   function closeModal(){ modal.hidden = true; }
 
-  avatar.addEventListener('click', openModal);
+  promptForIdentity = openModal;
+
+  avatar.addEventListener('click', () => openModal());
   avatar.addEventListener('keydown', e => {
     if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openModal(); }
   });
@@ -83,6 +93,7 @@ function renderIdentityAvatar(){
     e.preventDefault();
     setFamilyName(input.value);
     closeModal();
+    if (onNameSet) { const cb = onNameSet; onNameSet = null; cb(); }
   });
 
   renderIdentityAvatar();
@@ -1133,6 +1144,68 @@ function makeCrossDaySortable(containers, onReorder, onMove, onDragStateChange){
     .catch(() => {
       galleryEl.innerHTML = '<p class="photo-gallery-empty">Impossible de charger les photos pour le moment.</p>';
     });
+})();
+
+// ---------- Personal checklist (Administratif + Suica) ----------
+// Ties into the same lightweight identity system as the avatar: state is
+// saved server-side (Apps Script "Checklist" sheet, keyed by name), so it
+// survives across devices/browsers as long as the same name is used.
+(function initChecklist(){
+  const toggles = document.querySelectorAll('.checklist-toggle');
+  if (!toggles.length) return;
+  const apiUrl = DAY_PLANNER_CONFIG.apiUrl;
+
+  let items = {};
+
+  function applyState(){
+    toggles.forEach(btn => {
+      const id = btn.getAttribute('data-item');
+      const done = !!items[id];
+      btn.classList.toggle('checked', done);
+      const card = btn.closest('.card');
+      if (card) card.classList.toggle('checklist-done', done);
+    });
+  }
+
+  function loadChecklist(){
+    const name = getFamilyName();
+    if (!name || !apiUrl) { items = {}; applyState(); return Promise.resolve(); }
+    return fetch(`${apiUrl}?type=checklist&name=${encodeURIComponent(name)}&_=${Date.now()}`)
+      .then(res => res.json())
+      .then(data => { items = data.items || {}; applyState(); })
+      .catch(() => {});
+  }
+
+  function saveChecklist(){
+    const name = getFamilyName();
+    if (!name || !apiUrl) return;
+    fetch(apiUrl, {
+      method: 'POST',
+      body: JSON.stringify({ action: 'saveChecklist', name, items }),
+    }).catch(() => {});
+  }
+
+  function toggleItem(id){
+    items[id] = !items[id];
+    applyState();
+    saveChecklist();
+  }
+
+  toggles.forEach(btn => {
+    btn.addEventListener('click', e => {
+      e.preventDefault();
+      e.stopPropagation();
+      const id = btn.getAttribute('data-item');
+      if (!getFamilyName()) {
+        promptForIdentity(() => { loadChecklist().then(() => toggleItem(id)); });
+        return;
+      }
+      toggleItem(id);
+    });
+  });
+
+  document.addEventListener('familyNameChanged', loadChecklist);
+  loadChecklist();
 })();
 
 // Active dot nav tracking

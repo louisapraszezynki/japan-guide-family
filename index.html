@@ -22,7 +22,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;700&family=Zen+Maru+Gothic:wght@400;500;700&display=swap">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
-<link rel="stylesheet" href="style.css?v=59">
+<link rel="stylesheet" href="style.css?v=60">
 </head>
 <body>
 
@@ -30,6 +30,14 @@
 
 <div class="identity-avatar" id="identityAvatar" role="button" tabindex="0" aria-label="Indiquer votre prénom">
   <span class="identity-avatar-inner" id="identityAvatarInner">+</span>
+</div>
+
+<div class="identity-hint" id="identityHint">
+  <svg class="identity-hint-arrow" width="54" height="42" viewBox="0 0 54 42" fill="none" aria-hidden="true">
+    <path d="M4 38 C 12 10, 32 2, 48 4" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+    <path d="M38 1 L49 3 L45 13" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  </svg>
+  <span class="identity-hint-text">Identifiez-vous !</span>
 </div>
 
 <div class="identity-modal" id="identityModal" hidden>
@@ -63,7 +71,7 @@
     <div class="hero-content hero-reveal">
       <p class="kicker">プラゼザンキ家の日本旅行</p>
       <h1><span class="accent">Le carnet de voyage</span><br>de nos vacances<br><span class="accent">au Japon</span></h1>
-      <p class="hero-sub">Bienvenue dans ce guide de préparation pour votre voyage au Japon !</p>
+      <p class="hero-sub">Bienvenue sur notre carnet de voyage ! Vous pouvez y retrouver un guide de préparation, des astuces, partager vos idées et envies, ajouter des photos souvenirs...</p>
       <a href="#planning" class="scroll-cue">
         <span>Commencer la lecture</span>
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M12 4v16m0 0l-6-6m6 6l6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
@@ -242,7 +250,6 @@
     <div class="section-head reveal">
       <span class="section-num" data-before="02" data-after="04"></span>
       <h2>Carte</h2>
-      <p class="section-intro">Où nous sommes, et comment nous rejoindre.</p>
     </div>
 
     <div class="card-grid">
@@ -384,8 +391,7 @@
   <section id="climat" class="section alt">
     <div class="section-head reveal">
       <span class="section-num" data-before="04" data-after="03"></span>
-      <h2>Le climat</h2>
-      <p class="section-intro">À quoi s'attendre côté météo et quoi emmener dans votre valise.</p>
+      <h2>Météo et climat</h2>
     </div>
 
     <div class="card-grid">
@@ -409,19 +415,8 @@
 
       <div class="card wide reveal">
         <h3>📉 Tendances par région en septembre</h3>
-        <p>Moyennes des températures (min / max quotidiennes) observées en septembre ces 3 dernières années, du sud (encore très chaud) au nord (qui se rafraîchit plus tôt) :</p>
-        <table class="climate-table">
-          <thead><tr><th>Ville</th><th>T° min moy.</th><th>T° max moy.</th></tr></thead>
-          <tbody>
-            <tr><td>Kyoto</td><td>22°C</td><td>30°C</td></tr>
-            <tr><td>Tokyo</td><td>23°C</td><td>29°C</td></tr>
-            <tr><td>Niigata</td><td>22°C</td><td>28°C</td></tr>
-            <tr><td>Tsuruoka</td><td>19°C</td><td>27°C</td></tr>
-            <tr><td>Yonezawa</td><td>19°C</td><td>27°C</td></tr>
-            <tr><td>Sendai</td><td>19°C</td><td>26°C</td></tr>
-            <tr><td>Fujikawaguchiko</td><td>18°C</td><td>25°C</td></tr>
-          </tbody>
-        </table>
+        <p>Grosse tendance du sud (encore très chaud) au nord (qui se rafraîchit plus tôt) :</p>
+        <div class="climate-map" id="climateMap" role="img" aria-label="Carte des tendances de température au Japon en septembre"></div>
         <p class="note">🌀 Début septembre reste chaud et humide partout (encore proche de l'été, et c'est le pic de la saison des typhons). La baisse se fait surtout sentir en fin de mois, et plus nettement dans le Tohoku (Yonezawa, Sendai, Tsuruoka) qu'à Tokyo : entre le 1er et le 30 septembre, les nuits à Yonezawa perdent en moyenne près de 5°C, contre à peine 3-4°C à Tokyo.</p>
       </div>
 
@@ -628,6 +623,6 @@
 </main>
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
-<script src="script.js?v=38"></script>
+<script src="script.js?v=39"></script>
 </body>
 </html>

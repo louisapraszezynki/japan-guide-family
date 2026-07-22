@@ -58,6 +58,25 @@ a{color:var(--vermillion);}
   .identity-avatar{width:38px; height:38px; top:14px; right:14px; font-size:.95rem;}
 }
 
+.identity-hint{
+  position:fixed; top:62px; right:56px; z-index:94;
+  display:flex; flex-direction:column; align-items:flex-end; gap:2px;
+  color:var(--vermillion); pointer-events:none;
+  opacity:1; transition:opacity .4s ease;
+}
+.identity-hint.hidden{opacity:0;}
+.identity-hint-arrow{display:block;}
+.identity-hint-text{
+  font-family:'Shippori Mincho', serif; font-size:.85rem; font-weight:700;
+  background:var(--paper); padding:4px 12px; border-radius:100px;
+  box-shadow:0 2px 8px -2px rgba(0,0,0,.2); white-space:nowrap;
+}
+@media (max-width:640px){
+  .identity-hint{top:48px; right:40px;}
+  .identity-hint-arrow{width:40px; height:32px;}
+  .identity-hint-text{font-size:.75rem; padding:3px 10px;}
+}
+
 .identity-modal{
   position:fixed; inset:0; z-index:250; display:flex; align-items:center; justify-content:center;
   background:rgba(20,16,12,.55); padding:24px;
@@ -509,13 +528,21 @@ html.trip-started .section-num::before{content:attr(data-after);}
 .price-table th{color:var(--ink-soft); font-weight:600;}
 .price-table td:last-child, .price-table th:last-child{text-align:right;}
 
-.climate-table{width:100%; border-collapse:collapse; margin:16px 0; font-size:.95rem;}
-.climate-table th, .climate-table td{
-  text-align:left; padding:10px 14px; border-bottom:1px solid var(--line);
+.climate-map{
+  width:100%; aspect-ratio:16/9; margin:16px 0;
+  min-height:0; border-radius:var(--radius); overflow:hidden;
+  border:2px solid var(--line); background:var(--paper-alt);
 }
-.climate-table th{color:var(--ink-soft); font-weight:600;}
-.climate-table td:not(:first-child), .climate-table th:not(:first-child){text-align:right;}
-.climate-table td:first-child{font-weight:600;}
+.climate-map .leaflet-container{
+  width:100%; height:100%; font-family:'Zen Maru Gothic', sans-serif; background:var(--paper-alt);
+}
+.climate-map .leaflet-popup-content-wrapper{border-radius:10px;}
+.climate-map .leaflet-popup-content{font-family:'Zen Maru Gothic', sans-serif; font-size:.85rem; margin:8px 10px;}
+.climate-zone-label{
+  font-family:'Zen Maru Gothic', sans-serif; font-weight:700; font-size:.8rem;
+  color:#fff; text-shadow:0 1px 3px rgba(0,0,0,.5); white-space:nowrap; pointer-events:none;
+}
+@media (max-width:640px){ .climate-map{aspect-ratio:4/3;} }
 
 .reco-list{columns:2; column-gap:44px;}
 .reco{break-inside:avoid; margin-bottom:40px;}

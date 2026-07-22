@@ -105,6 +105,21 @@ let promptForIdentity = function(){};
   if (!getFamilyName()) openModal();
 })();
 
+// Curved-arrow hint pointing at the avatar, only while no name is set yet
+// and only near the very top of the page (hidden once you've scrolled
+// past the hero/intro, e.g. once section 01 comes into view).
+(function initIdentityHint(){
+  const hint = document.getElementById('identityHint');
+  if (!hint) return;
+  function update(){
+    const shouldShow = !getFamilyName() && window.scrollY < 80;
+    hint.classList.toggle('hidden', !shouldShow);
+  }
+  window.addEventListener('scroll', update, { passive: true });
+  document.addEventListener('familyNameChanged', update);
+  update();
+})();
+
 // Auto-swap image placeholders for real photos, if present
 document.querySelectorAll('.image-placeholder[data-slot]').forEach(el => {
   const src = el.getAttribute('data-slot');
@@ -254,6 +269,59 @@ document.querySelectorAll('.image-placeholder[data-slot]').forEach(el => {
   });
 
   map.fitBounds(L.latLngBounds(points.map(p => [p.lat, p.lng])), { padding: [30, 30] });
+
+  mapEl.addEventListener('click', () => map.scrollWheelZoom.enable());
+})();
+
+// September temperature-trend map: just 2 real pins (Tokyo, Yonezawa)
+// with their averages, plus two soft colored zones standing in for the
+// broader south-still-warm / north-cools-earlier trend (not precise
+// regional borders, just a rough visual cue).
+(function initClimateMap(){
+  const mapEl = document.getElementById('climateMap');
+  if (!mapEl || !window.L) return;
+
+  const map = L.map(mapEl, { scrollWheelZoom: false, minZoom: 5, maxZoom: 10 });
+
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+    maxZoom: 18,
+  }).addTo(map);
+
+  // Leaflet writes fillColor as a raw SVG attribute, not through an
+  // inline style, so CSS custom properties wouldn't resolve here —
+  // literal hex values matching --vermillion/--indigo instead.
+  L.circle([34.8, 135.8], {
+    radius: 320000, color: 'transparent', fillColor: '#c8483a', fillOpacity: 0.22,
+  }).addTo(map);
+  L.circle([38.6, 140.3], {
+    radius: 230000, color: 'transparent', fillColor: '#2b3a55', fillOpacity: 0.22,
+  }).addTo(map);
+
+  function zoneLabel(lat, lng, text){
+    L.marker([lat, lng], {
+      icon: L.divIcon({ html: `<span class="climate-zone-label">${text}</span>`, className: '', iconSize: null }),
+      interactive: false,
+    }).addTo(map);
+  }
+  zoneLabel(34.3, 135.8, '☀️ Encore chaud fin septembre');
+  zoneLabel(39.1, 140.3, '❄️ Se rafraîchit dès mi-septembre');
+
+  function pinIcon(emoji){
+    return L.divIcon({
+      html: `<div class="map-pin">${emoji}</div>`,
+      className: '', iconSize: [34, 34], iconAnchor: [17, 17], popupAnchor: [0, -17],
+    });
+  }
+  const points = [
+    { lat: 35.6812, lng: 139.7671, emoji: '🗼', label: '🗼 Tokyo — 23°C / 29°C en moyenne' },
+    { lat: 37.9227, lng: 140.1197, emoji: '🏠', label: '🏠 Yonezawa — 19°C / 27°C en moyenne' },
+  ];
+  points.forEach(p => {
+    L.marker([p.lat, p.lng], { icon: pinIcon(p.emoji) }).addTo(map).bindPopup(p.label);
+  });
+
+  map.fitBounds(L.latLngBounds([[33.9, 133.9], [39.7, 141.5]]), { padding: [10, 10] });
 
   mapEl.addEventListener('click', () => map.scrollWheelZoom.enable());
 })();

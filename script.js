@@ -70,6 +70,29 @@ function renderIdentityAvatar(){
 // someone tries to use them before an identity has been set.
 let promptForIdentity = function(){};
 
+// Only the Hugging Face deployment (app.py) requires real Google sign-in
+// and exposes /api/me; the public GitHub Pages copy has no such route.
+// When it's reachable and the signed-in email is a known family member,
+// identity is set automatically — no "who are you" prompt needed, since
+// the login gate already answered that question. Add mom/brother's real
+// addresses here once confirmed (must also be in the Space's
+// ALLOWED_EMAILS secret to ever reach this page at all).
+const AUTH_EMAIL_TO_NAME = {
+  'louisa.praszezynki@gmail.com': 'Louisa',
+};
+
+function tryAuthIdentity(){
+  return fetch('/api/me', { credentials: 'same-origin' })
+    .then(res => (res.ok ? res.json() : null))
+    .then(data => {
+      const email = ((data && data.email) || '').toLowerCase();
+      const name = AUTH_EMAIL_TO_NAME[email];
+      if (name) { setFamilyName(name); return true; }
+      return false;
+    })
+    .catch(() => false);
+}
+
 (function initIdentity(){
   const avatar = document.getElementById('identityAvatar');
   const modal = document.getElementById('identityModal');
@@ -102,7 +125,11 @@ let promptForIdentity = function(){};
   });
 
   renderIdentityAvatar();
-  if (!getFamilyName()) openModal();
+  // Try auto-detecting from the Google session first; only fall back to
+  // the manual prompt if that didn't resolve to a known family member.
+  tryAuthIdentity().then(detected => {
+    if (!detected && !getFamilyName()) openModal();
+  });
 })();
 
 // Curved-arrow hint pointing at the avatar, while no name is set yet OR

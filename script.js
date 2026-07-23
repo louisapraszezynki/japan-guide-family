@@ -175,8 +175,13 @@ const authIdentityCheck = tryAuthIdentity();
 // not-yet-saved delta since the last successful save, sent to the
 // backend's "incrementStats" action (a server-side read-modify-write, so
 // the client never needs to know the authoritative total to update it).
-let statsTotals = { eventsAdded: 0, eventsDeleted: 0, timeSpentSeconds: 0 };
-let statsPending = { eventsAdded: 0, eventsDeleted: 0, timeSpentSeconds: 0 };
+// eventsAdded/Deleted = day-planner entries (dated). ideasAdded/Deleted =
+// "Idées en vrac" backlog entries (undated).
+function emptyStats_(){
+  return { eventsAdded: 0, eventsDeleted: 0, ideasAdded: 0, ideasDeleted: 0, timeSpentSeconds: 0 };
+}
+let statsTotals = emptyStats_();
+let statsPending = emptyStats_();
 let statsActiveSince = null;
 
 function recordStatEvent(kind){
@@ -204,7 +209,13 @@ function loadStats(){
     .then(res => res.json())
     .then(data => {
       const s = data && data.stats;
-      if (s) statsTotals = { eventsAdded: s.eventsAdded || 0, eventsDeleted: s.eventsDeleted || 0, timeSpentSeconds: s.timeSpentSeconds || 0 };
+      if (s) {
+        statsTotals = {
+          eventsAdded: s.eventsAdded || 0, eventsDeleted: s.eventsDeleted || 0,
+          ideasAdded: s.ideasAdded || 0, ideasDeleted: s.ideasDeleted || 0,
+          timeSpentSeconds: s.timeSpentSeconds || 0,
+        };
+      }
     })
     .catch(() => {});
 }
@@ -214,8 +225,9 @@ function flushStats(useBeacon){
   const name = getFamilyName();
   if (!name || !DAY_PLANNER_CONFIG.apiUrl) return;
   const deltas = statsPending;
-  if (!deltas.eventsAdded && !deltas.eventsDeleted && !deltas.timeSpentSeconds) return;
-  statsPending = { eventsAdded: 0, eventsDeleted: 0, timeSpentSeconds: 0 };
+  const hasDelta = Object.keys(deltas).some(k => deltas[k]);
+  if (!hasDelta) return;
+  statsPending = emptyStats_();
   const body = JSON.stringify({ action: 'incrementStats', name, deltas });
   if (useBeacon && navigator.sendBeacon) {
     navigator.sendBeacon(DAY_PLANNER_CONFIG.apiUrl, body);
@@ -258,8 +270,10 @@ function formatStatsTime_(totalSeconds){
   const closeBtn = document.getElementById('profileModalClose');
   const photoEl = document.getElementById('profileModalPhoto');
   const nameEl = document.getElementById('profileModalName');
-  const addedEl = document.getElementById('profileStatAdded');
-  const deletedEl = document.getElementById('profileStatDeleted');
+  const eventsAddedEl = document.getElementById('profileStatEventsAdded');
+  const eventsDeletedEl = document.getElementById('profileStatEventsDeleted');
+  const ideasAddedEl = document.getElementById('profileStatIdeasAdded');
+  const ideasDeletedEl = document.getElementById('profileStatIdeasDeleted');
   const timeEl = document.getElementById('profileStatTime');
   if (!avatar || !modal || !closeBtn) return;
 
@@ -269,8 +283,10 @@ function formatStatsTime_(totalSeconds){
     const face = resolveFace(name);
     nameEl.textContent = name;
     photoEl.style.backgroundImage = face ? `url("${face.img}")` : 'none';
-    addedEl.textContent = statsTotals.eventsAdded;
-    deletedEl.textContent = statsTotals.eventsDeleted;
+    eventsAddedEl.textContent = statsTotals.eventsAdded;
+    eventsDeletedEl.textContent = statsTotals.eventsDeleted;
+    ideasAddedEl.textContent = statsTotals.ideasAdded;
+    ideasDeletedEl.textContent = statsTotals.ideasDeleted;
     timeEl.textContent = formatStatsTime_(statsTotals.timeSpentSeconds);
     modal.hidden = false;
   }
@@ -1124,7 +1140,7 @@ function makeCrossDaySortable(containers, onReorder, onMove, onDragStateChange){
       const id = btn.getAttribute('data-id');
       if (!confirm('Supprimer cette idée ?')) return;
       allEntries = allEntries.filter(en => en.id !== id);
-      recordStatEvent('eventsDeleted');
+      recordStatEvent('ideasDeleted');
       renderBacklog();
       if (!isConfigured()) return;
       fetch(DAY_PLANNER_CONFIG.apiUrl, {
@@ -1153,7 +1169,7 @@ function makeCrossDaySortable(containers, onReorder, onMove, onDragStateChange){
         .then(result => {
           if (!result || !result.success) throw new Error('add failed');
           allEntries.push({ id: result.id, date: '', name, category: '', emoji: '', text, order: result.order });
-          recordStatEvent('eventsAdded');
+          recordStatEvent('ideasAdded');
           renderBacklog();
           backlogInput.value = '';
           backlogForm.hidden = true;

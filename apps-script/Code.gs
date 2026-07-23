@@ -12,7 +12,9 @@ const CHECKLIST_SHEET_NAME = 'Checklist';
 const CHECKLIST_HEADERS = ['Name', 'ItemsJSON', 'UpdatedAt'];
 
 const STATS_SHEET_NAME = 'Stats';
-const STATS_HEADERS = ['Name', 'EventsAdded', 'EventsDeleted', 'TimeSpentSeconds', 'UpdatedAt'];
+// EventsAdded/Deleted = day-planner entries (dated, tied to a specific
+// day). IdeasAdded/Deleted = "Idées en vrac" backlog entries (undated).
+const STATS_HEADERS = ['Name', 'EventsAdded', 'EventsDeleted', 'IdeasAdded', 'IdeasDeleted', 'TimeSpentSeconds', 'UpdatedAt'];
 
 // The family iCloud Shared Album (public, read-only). Its token is the
 // part after "#" in the album's public link.
@@ -230,18 +232,25 @@ function findStatsRow_(sheet, data, key) {
   return -1;
 }
 
+// Field name -> 0-based index into a data row, matching STATS_HEADERS.
+const STATS_FIELDS = ['eventsAdded', 'eventsDeleted', 'ideasAdded', 'ideasDeleted', 'timeSpentSeconds'];
+
+function emptyStats_() {
+  const stats = {};
+  STATS_FIELDS.forEach(f => { stats[f] = 0; });
+  return stats;
+}
+
 function getStats_(name) {
   const key = normalizeChecklistName_(name);
-  if (!key) return { eventsAdded: 0, eventsDeleted: 0, timeSpentSeconds: 0 };
+  if (!key) return emptyStats_();
   const sheet = getStatsSheet_();
   const data = sheet.getDataRange().getValues();
   const i = findStatsRow_(sheet, data, key);
-  if (i === -1) return { eventsAdded: 0, eventsDeleted: 0, timeSpentSeconds: 0 };
-  return {
-    eventsAdded: Number(data[i][1]) || 0,
-    eventsDeleted: Number(data[i][2]) || 0,
-    timeSpentSeconds: Number(data[i][3]) || 0,
-  };
+  if (i === -1) return emptyStats_();
+  const stats = {};
+  STATS_FIELDS.forEach((f, idx) => { stats[f] = Number(data[i][idx + 1]) || 0; });
+  return stats;
 }
 
 function incrementStats_(name, deltas) {
@@ -250,24 +259,22 @@ function incrementStats_(name, deltas) {
   const sheet = getStatsSheet_();
   const data = sheet.getDataRange().getValues();
   const now = new Date();
-  const addedDelta = Number(deltas.eventsAdded) || 0;
-  const deletedDelta = Number(deltas.eventsDeleted) || 0;
-  const timeDelta = Number(deltas.timeSpentSeconds) || 0;
 
   const i = findStatsRow_(sheet, data, key);
+  const current = i === -1 ? emptyStats_() : {};
+  if (i !== -1) STATS_FIELDS.forEach((f, idx) => { current[f] = Number(data[i][idx + 1]) || 0; });
+
+  const updated = {};
+  STATS_FIELDS.forEach(f => { updated[f] = current[f] + (Number(deltas[f]) || 0); });
+
   if (i === -1) {
-    sheet.appendRow([name.trim(), addedDelta, deletedDelta, timeDelta, now]);
-    return { eventsAdded: addedDelta, eventsDeleted: deletedDelta, timeSpentSeconds: timeDelta };
+    sheet.appendRow([name.trim()].concat(STATS_FIELDS.map(f => updated[f])).concat([now]));
+  } else {
+    const row = i + 1;
+    STATS_FIELDS.forEach((f, idx) => sheet.getRange(row, idx + 2).setValue(updated[f]));
+    sheet.getRange(row, STATS_FIELDS.length + 2).setValue(now);
   }
-  const newAdded = (Number(data[i][1]) || 0) + addedDelta;
-  const newDeleted = (Number(data[i][2]) || 0) + deletedDelta;
-  const newTime = (Number(data[i][3]) || 0) + timeDelta;
-  const row = i + 1;
-  sheet.getRange(row, 2).setValue(newAdded);
-  sheet.getRange(row, 3).setValue(newDeleted);
-  sheet.getRange(row, 4).setValue(newTime);
-  sheet.getRange(row, 5).setValue(now);
-  return { eventsAdded: newAdded, eventsDeleted: newDeleted, timeSpentSeconds: newTime };
+  return updated;
 }
 
 function doPost(e) {

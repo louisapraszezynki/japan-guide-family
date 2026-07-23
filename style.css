@@ -284,6 +284,21 @@ html.trip-started .section-num::before{content:attr(data-after);}
   background-size:contain; background-repeat:no-repeat; background-position:center;
 }
 .hero-intro-map .ph-icon{font-size:5rem; opacity:.3;}
+
+.hero-intro-loading{
+  position:absolute; inset:0; z-index:10;
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  gap:14px; background:var(--paper); transition:opacity .4s ease;
+}
+.hero-intro-loading.hidden{opacity:0; pointer-events:none;}
+.hero-intro-spinner{
+  width:36px; height:36px; border-radius:50%;
+  border:3px solid var(--line); border-top-color:var(--vermillion);
+  animation:hero-intro-spin .9s linear infinite;
+}
+@keyframes hero-intro-spin{to{transform:rotate(360deg);}}
+.hero-intro-loading p{font-size:.85rem; color:var(--ink-soft); margin:0;}
+
 .hero-intro-group{
   /* z-index here (not just position) is what matters: Leaflet's internal
      panes have their own fairly high z-index values, so without this the
@@ -306,14 +321,18 @@ html.trip-started .section-num::before{content:attr(data-after);}
 .face-me{transform:translate(calc(-50% + 20px), -50%); z-index:3;}
 
 .face-mom{transform:translate(calc(-50% - 36px), calc(-50% - 38px)); z-index:2;}
-.face-mom{animation:intro-slide-in-mom 2.8s cubic-bezier(.22,.85,.3,1) .2s both;}
+/* Scoped to .hero-intro.ready (added by JS once the hero images have
+   actually finished loading) rather than applying unconditionally, so
+   the slide-in doesn't play against still-loading placeholder icons —
+   it's hidden behind the loading overlay until then regardless. */
+.hero-intro.ready .face-mom{animation:intro-slide-in-mom 2.8s cubic-bezier(.22,.85,.3,1) .2s both;}
 @keyframes intro-slide-in-mom{
   from{transform:translate(calc(-50% - 36px - 140vw), calc(-50% - 38px));}
   to{transform:translate(calc(-50% - 36px), calc(-50% - 38px));}
 }
 
 .face-brother{transform:translate(calc(-50% - 36px), calc(-50% + 38px)); z-index:1;}
-.face-brother{animation:intro-slide-in-brother 3.1s cubic-bezier(.22,.85,.3,1) .5s both;}
+.hero-intro.ready .face-brother{animation:intro-slide-in-brother 3.1s cubic-bezier(.22,.85,.3,1) .5s both;}
 @keyframes intro-slide-in-brother{
   from{transform:translate(calc(-50% - 36px - 140vw), calc(-50% + 38px));}
   to{transform:translate(calc(-50% - 36px), calc(-50% + 38px));}

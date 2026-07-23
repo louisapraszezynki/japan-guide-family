@@ -281,6 +281,25 @@ document.querySelectorAll('.image-placeholder[data-slot]').forEach(el => {
   heroEl.addEventListener('touchmove', e => {
     if (e.touches && e.touches[0]) followPointer(e.touches[0].clientX, e.touches[0].clientY);
   }, { passive: true });
+
+  // Don't start the slide-in until the map + face photos have actually
+  // loaded — otherwise the animation plays against empty placeholder
+  // icons. A hard 6s timeout keeps this from hanging forever if one
+  // image is slow or fails to load.
+  const loadingEl = document.getElementById('heroIntroLoading');
+  const sources = Array.from(introEl.querySelectorAll('[data-slot]')).map(el => el.getAttribute('data-slot'));
+  const loaders = sources.map(src => new Promise(resolve => {
+    const img = new Image();
+    img.onload = resolve;
+    img.onerror = resolve;
+    img.src = src;
+  }));
+  const timeout = new Promise(resolve => setTimeout(resolve, 6000));
+  Promise.race([Promise.all(loaders), timeout]).then(() => {
+    if (dismissed) return;
+    if (loadingEl) loadingEl.classList.add('hidden');
+    introEl.classList.add('ready');
+  });
 })();
 
 // Interactive Japan map (Leaflet + OpenStreetMap), pinned on Yonezawa,

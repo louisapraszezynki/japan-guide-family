@@ -346,8 +346,8 @@ html.trip-started .section-num::before{content:attr(data-after);}
    arrived) and freezes the resting transform with no animation attached,
    so that later removing .vibrating falls back to this static state
    instead of re-triggering the slide-in keyframes from scratch. */
-.face-mom.settled{transform:translate(calc(-50% - 36px), calc(-50% - 38px)); animation:none;}
-.face-brother.settled{transform:translate(calc(-50% - 36px), calc(-50% + 38px)); animation:none;}
+.hero-intro .face-mom.settled{transform:translate(calc(-50% - 36px), calc(-50% - 38px)); animation:none;}
+.hero-intro .face-brother.settled{transform:translate(calc(-50% - 36px), calc(-50% + 38px)); animation:none;}
 .face-lysandre.settled{transform:translate(calc(-50% - 76px), -50%); animation:none;}
 
 /* Longer, many-beat "partying" shake (~1.6s) rather than one quick jitter,
@@ -368,7 +368,10 @@ html.trip-started .section-num::before{content:attr(data-after);}
   83%{transform:translate(calc(-50% + 24px), calc(-50% + 2px));}
   92%{transform:translate(calc(-50% + 18px), calc(-50% + 3px));}
 }
-.face-mom.vibrating{animation:intro-vibrate-mom 1.6s ease-in-out;}
+/* .hero-intro prefix: needs to match (and, by coming later in the file,
+   beat) .hero-intro.ready .face-mom's specificity, otherwise that
+   slide-in rule keeps winning and mom never visibly shakes. */
+.hero-intro .face-mom.vibrating{animation:intro-vibrate-mom 1.6s ease-in-out;}
 @keyframes intro-vibrate-mom{
   0%,100%{transform:translate(calc(-50% - 36px), calc(-50% - 38px));}
   8%{transform:translate(calc(-50% - 40px), calc(-50% - 41px));}
@@ -383,7 +386,7 @@ html.trip-started .section-num::before{content:attr(data-after);}
   83%{transform:translate(calc(-50% - 32px), calc(-50% - 36px));}
   92%{transform:translate(calc(-50% - 34px), calc(-50% - 41px));}
 }
-.face-brother.vibrating{animation:intro-vibrate-brother 1.6s ease-in-out;}
+.hero-intro .face-brother.vibrating{animation:intro-vibrate-brother 1.6s ease-in-out;}
 @keyframes intro-vibrate-brother{
   0%,100%{transform:translate(calc(-50% - 36px), calc(-50% + 38px));}
   8%{transform:translate(calc(-50% - 40px), calc(-50% + 35px));}

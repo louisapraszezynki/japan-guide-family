@@ -15,15 +15,16 @@ All photo placeholders on the page now have a matching file in this folder:
 - `maman.png` → mother's face circle in the hero opening animation
 - `mathieu.png` → brother's face circle in the hero opening animation
 - `lysandre.png` → husband's face circle in the hero opening animation (test profile)
+- `map.jpg` → backdrop of the hero opening animation (plain red Japan silhouette, no labels)
 
 To swap any of these for a different photo later, just overwrite the file (same filename) or tell Claude which slot to repoint.
 
-The trip-dates calendar is no longer a photo — it's a real September 2026 calendar built into the page (Sept 3–23 highlighted), so `calendar.png` is unused. Same for the weather stats: they're a real table now, so `temperatures.png` is unused. The hero animation's map backdrop is a live Leaflet map now too (matching the Carte section), so `japan-map.png` is also unused.
+The trip-dates calendar is no longer a photo — it's a real September 2026 calendar built into the page (Sept 3–23 highlighted), so `calendar.png` is unused. Same for the weather stats: they're a real table now, so `temperatures.png` is unused.
 
 ## Other photos in this folder, unused
 
 - `hero-sticker.png` — the hero sticker was removed from the page
-- `japan-map.png` — was the hero animation's map backdrop before it switched to a live Leaflet map
+- `japan-map.png` — earlier version of the hero animation's map backdrop (labeled, briefly swapped for a live Leaflet map, then replaced again by `map.jpg`)
 - `inspiration3.png` — torii gate in a forest
 - `inspiration4.png` — vintage "FUJI" travel poster
 - `inspiration5.png` — illustrated ramen shopfront, Tokyo

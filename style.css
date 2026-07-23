@@ -277,13 +277,13 @@ html.trip-started .section-num::before{content:attr(data-after);}
   display:flex; align-items:center; justify-content:center;
 }
 .hero-intro.dismissed{opacity:0; pointer-events:none;}
-.hero-intro-map{
+.hero-intro-map.image-placeholder{
   position:relative; z-index:0; flex:none;
   width:min(90vw, 620px); height:min(90vh, 620px);
-  background:var(--paper-alt); pointer-events:none;
+  border:none; background-color:transparent; background-image:none; min-height:0;
+  background-size:contain; background-repeat:no-repeat; background-position:center;
 }
-.hero-intro-map .leaflet-container{background:var(--paper-alt); font-family:'Zen Maru Gothic', sans-serif;}
-.hero-intro-map .leaflet-control-attribution{font-size:.6rem;}
+.hero-intro-map .ph-icon{font-size:5rem; opacity:.3;}
 .hero-intro-group{
   /* z-index here (not just position) is what matters: Leaflet's internal
      panes have their own fairly high z-index values, so without this the

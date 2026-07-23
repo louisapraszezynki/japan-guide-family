@@ -281,30 +281,6 @@ document.querySelectorAll('.image-placeholder[data-slot]').forEach(el => {
   }, { passive: true });
 })();
 
-// Backdrop map for the hero opening animation: a real, minimal-style map
-// (CARTO Positron — light, low-clutter basemap) instead of the old flat
-// Japan silhouette PNG. Purely decorative: no zoom/pan controls, no
-// pointer interaction (the face circles are the real interactive layer).
-(function initHeroIntroMap(){
-  const mapEl = document.getElementById('heroIntroMap');
-  if (!mapEl || !window.L) return;
-
-  const map = L.map(mapEl, {
-    zoomControl: false, dragging: false, scrollWheelZoom: false,
-    doubleClickZoom: false, boxZoom: false, keyboard: false, touchZoom: false,
-    attributionControl: true,
-  });
-
-  L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
-    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>',
-    maxZoom: 19,
-  }).addTo(map);
-
-  // Roughly the same area as the Carte section's map (Kyoto up through
-  // Tohoku), so the family's route sits comfortably in frame.
-  map.fitBounds(L.latLngBounds([[33.9, 133.9], [39.7, 141.5]]), { padding: [10, 10] });
-})();
-
 // Interactive Japan map (Leaflet + OpenStreetMap), pinned on Yonezawa,
 // Tokyo and Mont Fuji. Wheel-zoom starts off so the map doesn't hijack
 // page scrolling; it turns on once the user actually clicks into it.

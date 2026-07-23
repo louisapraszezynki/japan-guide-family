@@ -93,6 +93,10 @@ function tryAuthIdentity(){
     .catch(() => false);
 }
 
+// Kicked off once, shared by initIdentity (to decide whether to prompt)
+// and initIdentityHint (to avoid flashing the arrow before this resolves).
+const authIdentityCheck = tryAuthIdentity();
+
 (function initIdentity(){
   const avatar = document.getElementById('identityAvatar');
   const modal = document.getElementById('identityModal');
@@ -127,7 +131,7 @@ function tryAuthIdentity(){
   renderIdentityAvatar();
   // Try auto-detecting from the Google session first; only fall back to
   // the manual prompt if that didn't resolve to a known family member.
-  tryAuthIdentity().then(detected => {
+  authIdentityCheck.then(detected => {
     if (!detected && !getFamilyName()) openModal();
   });
 })();
@@ -135,18 +139,23 @@ function tryAuthIdentity(){
 // Curved-arrow hint pointing at the avatar, while no name is set yet OR
 // the name set isn't a recognized family member, and only near the very
 // top of the page (hidden once you've scrolled past the hero/intro, e.g.
-// once section 01 comes into view).
+// once section 01 comes into view). Stays hidden until the Google-session
+// auto-detect check has resolved, so it never flashes on screen for
+// someone who's already identified via login (the HF deployment).
 (function initIdentityHint(){
   const hint = document.getElementById('identityHint');
   if (!hint) return;
+  let ready = false;
+  hint.classList.add('hidden'); // hidden by default; update() reveals it once ready
   function update(){
+    if (!ready) return;
     const name = getFamilyName();
     const shouldShow = (!name || !resolveFace(name)) && window.scrollY < 80;
     hint.classList.toggle('hidden', !shouldShow);
   }
   window.addEventListener('scroll', update, { passive: true });
   document.addEventListener('familyNameChanged', update);
-  update();
+  authIdentityCheck.then(() => { ready = true; update(); });
 })();
 
 // Auto-swap image placeholders for real photos, if present

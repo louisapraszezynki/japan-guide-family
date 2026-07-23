@@ -275,7 +275,51 @@ function formatStatsTime_(totalSeconds){
   const ideasAddedEl = document.getElementById('profileStatIdeasAdded');
   const ideasDeletedEl = document.getElementById('profileStatIdeasDeleted');
   const timeEl = document.getElementById('profileStatTime');
+  const leaderboardList = document.getElementById('profileLeaderboardList');
   if (!avatar || !modal || !closeBtn) return;
+
+  function escapeHtml(str){
+    const div = document.createElement('div');
+    div.textContent = str || '';
+    return div.innerHTML;
+  }
+
+  // Ranked by total contributions (events + ideas added) — the "fun"
+  // number, rather than something that could read as a criticism (like
+  // deletions) or that isn't really comparable (time spent).
+  function loadLeaderboard(){
+    if (!leaderboardList || !DAY_PLANNER_CONFIG.apiUrl) return;
+    leaderboardList.innerHTML = '<p class="backlog-empty">Chargement...</p>';
+    fetch(`${DAY_PLANNER_CONFIG.apiUrl}?type=allStats&_=${Date.now()}`)
+      .then(res => res.json())
+      .then(data => {
+        const all = (data && data.all) || [];
+        const ranked = all
+          .map(s => ({ name: s.name, score: (s.eventsAdded || 0) + (s.ideasAdded || 0) }))
+          .sort((a, b) => b.score - a.score);
+        if (!ranked.length) {
+          leaderboardList.innerHTML = '<p class="backlog-empty">Personne n\'a encore contribué.</p>';
+          return;
+        }
+        const medals = ['🥇', '🥈', '🥉'];
+        const currentName = getFamilyName();
+        leaderboardList.innerHTML = ranked.map((r, i) => {
+          const face = resolveFace(r.name);
+          const isYou = normalizeName_(r.name) === normalizeName_(currentName);
+          const rank = medals[i] || `${i + 1}.`;
+          return `
+            <div class="leaderboard-row${isYou ? ' is-you' : ''}">
+              <span class="leaderboard-rank">${rank}</span>
+              <span class="leaderboard-photo" style="background-image:${face ? `url('${face.img}')` : 'none'}"></span>
+              <span class="leaderboard-name">${escapeHtml(r.name)}${isYou ? ' (vous)' : ''}</span>
+              <span class="leaderboard-score">${r.score}</span>
+            </div>`;
+        }).join('');
+      })
+      .catch(() => {
+        leaderboardList.innerHTML = '<p class="backlog-empty">Impossible de charger le classement.</p>';
+      });
+  }
 
   function openModal(){
     accumulateActiveTime_(); // include time-so-far, not just the last synced snapshot
@@ -289,6 +333,7 @@ function formatStatsTime_(totalSeconds){
     ideasDeletedEl.textContent = statsTotals.ideasDeleted;
     timeEl.textContent = formatStatsTime_(statsTotals.timeSpentSeconds);
     modal.hidden = false;
+    loadLeaderboard();
   }
   function closeModal(){ modal.hidden = true; }
 

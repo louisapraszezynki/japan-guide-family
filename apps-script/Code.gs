@@ -88,6 +88,10 @@ function doGet(e) {
     return jsonResponse_({ stats: getStats_(e.parameter.name || '') });
   }
 
+  if (e.parameter && e.parameter.type === 'allStats') {
+    return jsonResponse_({ all: getAllStats_() });
+  }
+
   const sheet = getSheet_();
   const data = sheet.getDataRange().getValues();
   const rows = data.slice(1); // skip header row
@@ -251,6 +255,18 @@ function getStats_(name) {
   const stats = {};
   STATS_FIELDS.forEach((f, idx) => { stats[f] = Number(data[i][idx + 1]) || 0; });
   return stats;
+}
+
+function getAllStats_() {
+  const sheet = getStatsSheet_();
+  const data = sheet.getDataRange().getValues();
+  return data.slice(1)
+    .filter(r => r[0])
+    .map(r => {
+      const stats = { name: r[0] };
+      STATS_FIELDS.forEach((f, idx) => { stats[f] = Number(r[idx + 1]) || 0; });
+      return stats;
+    });
 }
 
 function incrementStats_(name, deltas) {

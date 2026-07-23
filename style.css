@@ -130,6 +130,24 @@ a{color:var(--vermillion);}
 .profile-stat-value{font-family:'Shippori Mincho', serif; font-weight:700; font-size:1.15rem; color:var(--vermillion);}
 .profile-stat-label{font-size:.82rem; color:var(--ink-soft); text-align:right;}
 
+.profile-leaderboard{margin-top:24px; padding-top:20px; border-top:1px solid var(--line);}
+.profile-leaderboard h4{
+  font-family:'Shippori Mincho', serif; font-size:1rem; color:var(--ink); margin-bottom:12px; text-align:left;
+}
+.profile-leaderboard-list{display:flex; flex-direction:column; gap:8px;}
+.leaderboard-row{
+  display:flex; align-items:center; gap:10px;
+  background:var(--paper-alt); border-radius:10px; padding:8px 12px;
+}
+.leaderboard-row.is-you{background:var(--vermillion-soft); }
+.leaderboard-rank{font-family:'Shippori Mincho', serif; font-weight:700; font-size:.9rem; color:var(--ink-soft); width:20px; flex:none; text-align:center;}
+.leaderboard-photo{
+  width:30px; height:30px; border-radius:50%; flex:none;
+  background:var(--indigo) center/cover no-repeat;
+}
+.leaderboard-name{flex:1; min-width:0; font-size:.88rem; color:var(--ink); text-align:left; font-weight:600;}
+.leaderboard-score{font-family:'Shippori Mincho', serif; font-weight:700; font-size:.95rem; color:var(--vermillion);}
+
 /* ---------- dot nav ---------- */
 .dot-nav{
   position:fixed; right:28px; top:50%; transform:translateY(-50%);

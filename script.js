@@ -76,12 +76,14 @@ let promptForIdentity = function(){};
 // and exposes /api/me; the public GitHub Pages copy has no such route.
 // When it's reachable and the signed-in email is a known family member,
 // identity is set automatically — no "who are you" prompt needed, since
-// the login gate already answered that question. Add mom/brother's real
-// addresses here once confirmed (must also be in the Space's
-// ALLOWED_EMAILS secret to ever reach this page at all).
+// the login gate already answered that question. Every address listed
+// here must also be in the Space's ALLOWED_EMAILS secret to ever reach
+// this page at all.
 const AUTH_EMAIL_TO_NAME = {
   'louisa.praszezynki@gmail.com': 'Louisa',
   'hi@lysand.re': 'Lysandre',
+  'emmanuelle.praszezynki@gmail.com': 'Maman',
+  'matpraszezynki@gmail.com': 'Mathieu',
 };
 
 // True once identity has been confirmed via real Google sign-in — at that

@@ -788,7 +788,7 @@ function makeCrossDaySortable(containers, onReorder, onMove, onDragStateChange){
   const entriesEl = document.getElementById('dayPanelEntries');
   const resetBtn = document.getElementById('dayPanelReset');
   const form = document.getElementById('dayPanelForm');
-  const nameInput = document.getElementById('dayPanelName');
+  const formAuthor = document.getElementById('dayPanelFormAuthor');
   const categoryInput = document.getElementById('dayPanelCategory');
   const categoryEmojiInput = document.getElementById('dayPanelCategoryEmoji');
   const emojiPicker = document.getElementById('dayPanelEmojiPicker');
@@ -1101,14 +1101,20 @@ function makeCrossDaySortable(containers, onReorder, onMove, onDragStateChange){
     makeSortable(entriesEl, orderedIds => reorderDay(dateStr, orderedIds), dragging => { isDraggingEntry = dragging; });
   }
 
+  function updateFormAuthor(){
+    if (!formAuthor) return;
+    const name = getFamilyName();
+    formAuthor.textContent = name ? `Ajouté par ${name}` : '';
+  }
+  document.addEventListener('familyNameChanged', updateFormAuthor);
+
   function selectDay(dateStr, btn){
     currentDate = dateStr;
     dayButtons.forEach(b => b.classList.toggle('active-day', b === btn));
 
     const label = new Date(dateStr + 'T00:00:00').toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' });
     titleEl.textContent = label.charAt(0).toUpperCase() + label.slice(1);
-    const savedName = getFamilyName();
-    if (savedName) nameInput.value = savedName;
+    updateFormAuthor();
     categoryInput.value = '';
     resetEmojiPicker();
     textInput.value = '';
@@ -1143,21 +1149,15 @@ function makeCrossDaySortable(containers, onReorder, onMove, onDragStateChange){
     renderWeekView();
   }
 
-  form.addEventListener('submit', e => {
-    e.preventDefault();
-    if (!isConfigured() || !currentDate) {
-      formStatus.textContent = "La liste partagée n'est pas encore configurée.";
-      return;
-    }
-    const name = nameInput.value.trim();
+  function submitDayEntry(){
+    const name = getFamilyName();
     const category = categoryInput.value.trim();
     const emoji = categoryEmojiInput.value.trim();
     const text = textInput.value.trim();
-    if (!name) { formStatus.textContent = 'Merci de renseigner votre prénom.'; return; }
+    if (!name) { promptForIdentity(submitDayEntry); return; }
     if (!category) { formStatus.textContent = 'Merci de choisir une catégorie.'; return; }
     if (!emoji) { formStatus.textContent = 'Choisissez un émoji pour cette catégorie.'; return; }
     if (!text) { formStatus.textContent = 'Merci de décrire votre idée.'; return; }
-    setFamilyName(name);
 
     const submitBtn = form.querySelector('button');
     submitBtn.disabled = true;
@@ -1186,6 +1186,15 @@ function makeCrossDaySortable(containers, onReorder, onMove, onDragStateChange){
       .finally(() => {
         submitBtn.disabled = false;
       });
+  }
+
+  form.addEventListener('submit', e => {
+    e.preventDefault();
+    if (!isConfigured() || !currentDate) {
+      formStatus.textContent = "La liste partagée n'est pas encore configurée.";
+      return;
+    }
+    submitDayEntry();
   });
 
   renderBacklog();

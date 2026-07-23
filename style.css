@@ -851,6 +851,7 @@ html.trip-started .section-num::before{content:attr(data-after);}
 .day-panel-form-title{
   font-family:'Shippori Mincho', serif; font-size:1rem; color:var(--ink); margin:0 0 2px;
 }
+.day-panel-form-author{font-size:.78rem; color:var(--ink-soft); margin:0 0 6px;}
 .day-panel-form-row{display:flex; gap:10px; align-items:flex-start;}
 .day-panel-form-row input{flex:1; min-width:0;}
 .day-panel-form input, .day-panel-form textarea{

@@ -54,6 +54,8 @@ a{color:var(--vermillion);}
 }
 .identity-avatar:hover{transform:scale(1.08);}
 .identity-avatar.has-photo .identity-avatar-inner{display:none;}
+.identity-avatar.locked{cursor:default;}
+.identity-avatar.locked:hover{transform:none;}
 @media (max-width:640px){
   .identity-avatar{width:38px; height:38px; top:14px; right:14px; font-size:.95rem;}
 }
@@ -275,13 +277,13 @@ html.trip-started .section-num::before{content:attr(data-after);}
   display:flex; align-items:center; justify-content:center;
 }
 .hero-intro.dismissed{opacity:0; pointer-events:none;}
-.hero-intro-map.image-placeholder{
+.hero-intro-map{
   position:static; flex:none;
   width:min(90vw, 620px); height:min(90vh, 620px);
-  border:none; background-color:transparent; background-image:none; min-height:0;
-  background-size:contain; background-repeat:no-repeat; background-position:center;
+  background:var(--paper-alt); pointer-events:none;
 }
-.hero-intro-map .ph-icon{font-size:5rem; opacity:.3;}
+.hero-intro-map .leaflet-container{background:var(--paper-alt); font-family:'Zen Maru Gothic', sans-serif;}
+.hero-intro-map .leaflet-control-attribution{font-size:.6rem;}
 .hero-intro-group{
   position:absolute; left:53%; top:54%; width:0; height:0;
   transition:transform .35s ease-out;
@@ -312,12 +314,23 @@ html.trip-started .section-num::before{content:attr(data-after);}
   to{transform:translate(calc(-50% - 36px), calc(-50% + 38px));}
 }
 
+/* Lysandre sits further left/behind the cluster (lowest z-index) and
+   arrives fastest (2.6s), so .face-brother still legitimately finishes
+   last and keeps triggering the reunion shake without any JS changes. */
+.face-lysandre{transform:translate(calc(-50% - 76px), -50%); z-index:0;}
+.face-lysandre{animation:intro-slide-in-lysandre 2.6s cubic-bezier(.22,.85,.3,1) .1s both;}
+@keyframes intro-slide-in-lysandre{
+  from{transform:translate(calc(-50% - 76px - 140vw), -50%);}
+  to{transform:translate(calc(-50% - 76px), -50%);}
+}
+
 /* .settled is added at the same time as .vibrating (once both faces have
    arrived) and freezes the resting transform with no animation attached,
    so that later removing .vibrating falls back to this static state
    instead of re-triggering the slide-in keyframes from scratch. */
 .face-mom.settled{transform:translate(calc(-50% - 36px), calc(-50% - 38px)); animation:none;}
 .face-brother.settled{transform:translate(calc(-50% - 36px), calc(-50% + 38px)); animation:none;}
+.face-lysandre.settled{transform:translate(calc(-50% - 76px), -50%); animation:none;}
 
 /* Longer, many-beat "partying" shake (~1.6s) rather than one quick jitter,
    built from the same handful of offsets repeated with slight variation
@@ -366,6 +379,21 @@ html.trip-started .section-num::before{content:attr(data-after);}
   75%{transform:translate(calc(-50% - 40px), calc(-50% + 36px));}
   83%{transform:translate(calc(-50% - 32px), calc(-50% + 40px));}
   92%{transform:translate(calc(-50% - 34px), calc(-50% + 35px));}
+}
+.face-lysandre.vibrating{animation:intro-vibrate-lysandre 1.6s ease-in-out;}
+@keyframes intro-vibrate-lysandre{
+  0%,100%{transform:translate(calc(-50% - 76px), -50%);}
+  8%{transform:translate(calc(-50% - 80px), calc(-50% - 3px));}
+  17%{transform:translate(calc(-50% - 72px), calc(-50% + 3px));}
+  25%{transform:translate(calc(-50% - 79px), calc(-50% + 4px));}
+  33%{transform:translate(calc(-50% - 73px), calc(-50% - 4px));}
+  42%{transform:translate(calc(-50% - 80px), calc(-50% + 3px));}
+  50%{transform:translate(calc(-50% - 72px), calc(-50% - 3px));}
+  58%{transform:translate(calc(-50% - 79px), calc(-50% - 4px));}
+  67%{transform:translate(calc(-50% - 73px), calc(-50% + 4px));}
+  75%{transform:translate(calc(-50% - 80px), calc(-50% - 2px));}
+  83%{transform:translate(calc(-50% - 72px), calc(-50% + 2px));}
+  92%{transform:translate(calc(-50% - 74px), calc(-50% + 3px));}
 }
 
 @media (max-width:640px){

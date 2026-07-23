@@ -54,7 +54,8 @@ function renderIdentityAvatar(){
     return;
   }
   const face = resolveFace(name);
-  avatar.setAttribute('aria-label', `${name} — cliquer pour changer`);
+  avatar.setAttribute('aria-label', identityLocked ? name : `${name} — cliquer pour changer`);
+  avatar.classList.toggle('locked', identityLocked);
   if (face) {
     avatar.classList.add('has-photo');
     setAvatarBg('var(--indigo)', `url("${face.img}")`);
@@ -83,13 +84,18 @@ const AUTH_EMAIL_TO_NAME = {
   'hi@lysand.re': 'Lysandre',
 };
 
+// True once identity has been confirmed via real Google sign-in — at that
+// point there's nothing to "change" (it's not a typed-in name anymore),
+// so the avatar stops being clickable.
+let identityLocked = false;
+
 function tryAuthIdentity(){
   return fetch('/api/me', { credentials: 'same-origin' })
     .then(res => (res.ok ? res.json() : null))
     .then(data => {
       const email = ((data && data.email) || '').toLowerCase();
       const name = AUTH_EMAIL_TO_NAME[email];
-      if (name) { setFamilyName(name); return true; }
+      if (name) { identityLocked = true; setFamilyName(name); return true; }
       return false;
     })
     .catch(() => false);
@@ -118,8 +124,9 @@ const authIdentityCheck = tryAuthIdentity();
 
   promptForIdentity = openModal;
 
-  avatar.addEventListener('click', () => openModal());
+  avatar.addEventListener('click', () => { if (!identityLocked) openModal(); });
   avatar.addEventListener('keydown', e => {
+    if (identityLocked) return;
     if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openModal(); }
   });
   modal.addEventListener('click', e => { if (e.target === modal) closeModal(); });
@@ -272,6 +279,30 @@ document.querySelectorAll('.image-placeholder[data-slot]').forEach(el => {
   heroEl.addEventListener('touchmove', e => {
     if (e.touches && e.touches[0]) followPointer(e.touches[0].clientX, e.touches[0].clientY);
   }, { passive: true });
+})();
+
+// Backdrop map for the hero opening animation: a real, minimal-style map
+// (CARTO Positron — light, low-clutter basemap) instead of the old flat
+// Japan silhouette PNG. Purely decorative: no zoom/pan controls, no
+// pointer interaction (the face circles are the real interactive layer).
+(function initHeroIntroMap(){
+  const mapEl = document.getElementById('heroIntroMap');
+  if (!mapEl || !window.L) return;
+
+  const map = L.map(mapEl, {
+    zoomControl: false, dragging: false, scrollWheelZoom: false,
+    doubleClickZoom: false, boxZoom: false, keyboard: false, touchZoom: false,
+    attributionControl: true,
+  });
+
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>',
+    maxZoom: 19,
+  }).addTo(map);
+
+  // Roughly the same area as the Carte section's map (Kyoto up through
+  // Tohoku), so the family's route sits comfortably in frame.
+  map.fitBounds(L.latLngBounds([[33.9, 133.9], [39.7, 141.5]]), { padding: [10, 10] });
 })();
 
 // Interactive Japan map (Leaflet + OpenStreetMap), pinned on Yonezawa,

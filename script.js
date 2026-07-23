@@ -169,6 +169,118 @@ const authIdentityCheck = tryAuthIdentity();
   authIdentityCheck.then(() => { ready = true; update(); });
 })();
 
+// ---------- Personal activity stats (Google-authenticated deployment
+// only, since it's tied to identityLocked) ----------
+// statsTotals is what's shown in the profile popup; statsPending is the
+// not-yet-saved delta since the last successful save, sent to the
+// backend's "incrementStats" action (a server-side read-modify-write, so
+// the client never needs to know the authoritative total to update it).
+let statsTotals = { eventsAdded: 0, eventsDeleted: 0, timeSpentSeconds: 0 };
+let statsPending = { eventsAdded: 0, eventsDeleted: 0, timeSpentSeconds: 0 };
+let statsActiveSince = null;
+
+function recordStatEvent(kind){
+  if (!identityLocked) return;
+  statsTotals[kind] = (statsTotals[kind] || 0) + 1;
+  statsPending[kind] = (statsPending[kind] || 0) + 1;
+  flushStats();
+}
+
+function accumulateActiveTime_(){
+  if (!statsActiveSince) return;
+  const elapsed = Math.round((Date.now() - statsActiveSince) / 1000);
+  if (elapsed > 0) {
+    statsTotals.timeSpentSeconds += elapsed;
+    statsPending.timeSpentSeconds += elapsed;
+  }
+  statsActiveSince = document.visibilityState === 'visible' ? Date.now() : null;
+}
+
+function loadStats(){
+  if (!identityLocked) return;
+  const name = getFamilyName();
+  if (!name || !DAY_PLANNER_CONFIG.apiUrl) return;
+  fetch(`${DAY_PLANNER_CONFIG.apiUrl}?type=stats&name=${encodeURIComponent(name)}&_=${Date.now()}`)
+    .then(res => res.json())
+    .then(data => {
+      const s = data && data.stats;
+      if (s) statsTotals = { eventsAdded: s.eventsAdded || 0, eventsDeleted: s.eventsDeleted || 0, timeSpentSeconds: s.timeSpentSeconds || 0 };
+    })
+    .catch(() => {});
+}
+
+function flushStats(useBeacon){
+  if (!identityLocked) return;
+  const name = getFamilyName();
+  if (!name || !DAY_PLANNER_CONFIG.apiUrl) return;
+  const deltas = statsPending;
+  if (!deltas.eventsAdded && !deltas.eventsDeleted && !deltas.timeSpentSeconds) return;
+  statsPending = { eventsAdded: 0, eventsDeleted: 0, timeSpentSeconds: 0 };
+  const body = JSON.stringify({ action: 'incrementStats', name, deltas });
+  if (useBeacon && navigator.sendBeacon) {
+    navigator.sendBeacon(DAY_PLANNER_CONFIG.apiUrl, body);
+    return;
+  }
+  fetch(DAY_PLANNER_CONFIG.apiUrl, { method: 'POST', body })
+    .then(res => res.json())
+    .then(data => { if (data && data.stats) statsTotals = data.stats; })
+    .catch(() => {});
+}
+
+(function initStatsTracking(){
+  authIdentityCheck.then(detected => {
+    if (!detected) return;
+    loadStats();
+    if (document.visibilityState === 'visible') statsActiveSince = Date.now();
+  });
+
+  document.addEventListener('visibilitychange', () => {
+    accumulateActiveTime_();
+    if (document.visibilityState === 'hidden') flushStats();
+  });
+  // Periodic safety-net flush so a long single session doesn't lose
+  // everything if the tab is later closed abruptly (crash, force-quit).
+  setInterval(() => { accumulateActiveTime_(); flushStats(); }, 20000);
+  window.addEventListener('pagehide', () => { accumulateActiveTime_(); flushStats(true); });
+})();
+
+function formatStatsTime_(totalSeconds){
+  const h = Math.floor(totalSeconds / 3600);
+  const m = Math.floor((totalSeconds % 3600) / 60);
+  if (h > 0) return `${h}h${String(m).padStart(2, '0')}`;
+  if (m > 0) return `${m} min`;
+  return `${totalSeconds}s`;
+}
+
+(function initProfileModal(){
+  const avatar = document.getElementById('identityAvatar');
+  const modal = document.getElementById('profileModal');
+  const closeBtn = document.getElementById('profileModalClose');
+  const photoEl = document.getElementById('profileModalPhoto');
+  const nameEl = document.getElementById('profileModalName');
+  const addedEl = document.getElementById('profileStatAdded');
+  const deletedEl = document.getElementById('profileStatDeleted');
+  const timeEl = document.getElementById('profileStatTime');
+  if (!avatar || !modal || !closeBtn) return;
+
+  function openModal(){
+    accumulateActiveTime_(); // include time-so-far, not just the last synced snapshot
+    const name = getFamilyName();
+    const face = resolveFace(name);
+    nameEl.textContent = name;
+    photoEl.style.backgroundImage = face ? `url("${face.img}")` : 'none';
+    addedEl.textContent = statsTotals.eventsAdded;
+    deletedEl.textContent = statsTotals.eventsDeleted;
+    timeEl.textContent = formatStatsTime_(statsTotals.timeSpentSeconds);
+    modal.hidden = false;
+  }
+  function closeModal(){ modal.hidden = true; }
+
+  avatar.addEventListener('click', () => { if (identityLocked) openModal(); });
+  closeBtn.addEventListener('click', closeModal);
+  modal.addEventListener('click', e => { if (e.target === modal) closeModal(); });
+})();
+
 // Auto-swap image placeholders for real photos, if present
 document.querySelectorAll('.image-placeholder[data-slot]').forEach(el => {
   const src = el.getAttribute('data-slot');
@@ -967,6 +1079,7 @@ function makeCrossDaySortable(containers, onReorder, onMove, onDragStateChange){
     const entry = allEntries.find(e => e.id === id);
     const dateStr = entry ? entry.date : null;
     allEntries = allEntries.filter(e => e.id !== id);
+    recordStatEvent('eventsDeleted');
     updateBadges();
     renderWeekView();
     if (dateStr === currentDate) renderEntriesFor(currentDate);
@@ -1011,6 +1124,7 @@ function makeCrossDaySortable(containers, onReorder, onMove, onDragStateChange){
       const id = btn.getAttribute('data-id');
       if (!confirm('Supprimer cette idée ?')) return;
       allEntries = allEntries.filter(en => en.id !== id);
+      recordStatEvent('eventsDeleted');
       renderBacklog();
       if (!isConfigured()) return;
       fetch(DAY_PLANNER_CONFIG.apiUrl, {
@@ -1039,6 +1153,7 @@ function makeCrossDaySortable(containers, onReorder, onMove, onDragStateChange){
         .then(result => {
           if (!result || !result.success) throw new Error('add failed');
           allEntries.push({ id: result.id, date: '', name, category: '', emoji: '', text, order: result.order });
+          recordStatEvent('eventsAdded');
           renderBacklog();
           backlogInput.value = '';
           backlogForm.hidden = true;
@@ -1201,6 +1316,7 @@ function makeCrossDaySortable(containers, onReorder, onMove, onDragStateChange){
       .then(result => {
         if (!result || !result.success) throw new Error('add failed');
         allEntries.push({ id: result.id, date: currentDate, name, category, emoji, text, order: result.order });
+        recordStatEvent('eventsAdded');
         updateBadges();
         renderEntriesFor(currentDate);
         renderWeekView();

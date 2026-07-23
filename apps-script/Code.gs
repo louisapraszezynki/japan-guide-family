@@ -11,6 +11,9 @@ const HEADERS = ['ID', 'Date', 'Name', 'Category', 'Emoji', 'Text', 'Order', 'Cr
 const CHECKLIST_SHEET_NAME = 'Checklist';
 const CHECKLIST_HEADERS = ['Name', 'ItemsJSON', 'UpdatedAt'];
 
+const STATS_SHEET_NAME = 'Stats';
+const STATS_HEADERS = ['Name', 'EventsAdded', 'EventsDeleted', 'TimeSpentSeconds', 'UpdatedAt'];
+
 // The family iCloud Shared Album (public, read-only). Its token is the
 // part after "#" in the album's public link.
 const ICLOUD_ALBUM_TOKEN = 'B24JtdOXmKOo432';
@@ -47,6 +50,16 @@ function getChecklistSheet_() {
   return sheet;
 }
 
+function getStatsSheet_() {
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  let sheet = ss.getSheetByName(STATS_SHEET_NAME);
+  if (!sheet) {
+    sheet = ss.insertSheet(STATS_SHEET_NAME);
+    sheet.appendRow(STATS_HEADERS);
+  }
+  return sheet;
+}
+
 // Defensive: normalizes a cell value back to "YYYY-MM-DD" even if it was
 // already auto-converted to a real Date (e.g. rows written before the
 // plain-text fix above, or someone editing the sheet by hand).
@@ -67,6 +80,10 @@ function doGet(e) {
 
   if (e.parameter && e.parameter.type === 'checklist') {
     return jsonResponse_({ items: getChecklistItems_(e.parameter.name || '') });
+  }
+
+  if (e.parameter && e.parameter.type === 'stats') {
+    return jsonResponse_({ stats: getStats_(e.parameter.name || '') });
   }
 
   const sheet = getSheet_();
@@ -199,6 +216,60 @@ function saveChecklistItems_(name, items) {
   sheet.appendRow([name.trim(), itemsJson, now]);
 }
 
+// ---------- Personal activity stats (per name) ----------
+// Numeric columns instead of a JSON blob (unlike the checklist) so
+// increments are a simple read-modify-write on each cell — the client
+// reports deltas ("+1 event added", "+37s spent") since its last save
+// rather than absolute totals, so it doesn't need to know the current
+// server-side total first.
+
+function findStatsRow_(sheet, data, key) {
+  for (let i = 1; i < data.length; i++) {
+    if (normalizeChecklistName_(data[i][0]) === key) return i; // 0-based index into data
+  }
+  return -1;
+}
+
+function getStats_(name) {
+  const key = normalizeChecklistName_(name);
+  if (!key) return { eventsAdded: 0, eventsDeleted: 0, timeSpentSeconds: 0 };
+  const sheet = getStatsSheet_();
+  const data = sheet.getDataRange().getValues();
+  const i = findStatsRow_(sheet, data, key);
+  if (i === -1) return { eventsAdded: 0, eventsDeleted: 0, timeSpentSeconds: 0 };
+  return {
+    eventsAdded: Number(data[i][1]) || 0,
+    eventsDeleted: Number(data[i][2]) || 0,
+    timeSpentSeconds: Number(data[i][3]) || 0,
+  };
+}
+
+function incrementStats_(name, deltas) {
+  const key = normalizeChecklistName_(name);
+  if (!key) return getStats_(name);
+  const sheet = getStatsSheet_();
+  const data = sheet.getDataRange().getValues();
+  const now = new Date();
+  const addedDelta = Number(deltas.eventsAdded) || 0;
+  const deletedDelta = Number(deltas.eventsDeleted) || 0;
+  const timeDelta = Number(deltas.timeSpentSeconds) || 0;
+
+  const i = findStatsRow_(sheet, data, key);
+  if (i === -1) {
+    sheet.appendRow([name.trim(), addedDelta, deletedDelta, timeDelta, now]);
+    return { eventsAdded: addedDelta, eventsDeleted: deletedDelta, timeSpentSeconds: timeDelta };
+  }
+  const newAdded = (Number(data[i][1]) || 0) + addedDelta;
+  const newDeleted = (Number(data[i][2]) || 0) + deletedDelta;
+  const newTime = (Number(data[i][3]) || 0) + timeDelta;
+  const row = i + 1;
+  sheet.getRange(row, 2).setValue(newAdded);
+  sheet.getRange(row, 3).setValue(newDeleted);
+  sheet.getRange(row, 4).setValue(newTime);
+  sheet.getRange(row, 5).setValue(now);
+  return { eventsAdded: newAdded, eventsDeleted: newDeleted, timeSpentSeconds: newTime };
+}
+
 function doPost(e) {
   let body;
   try {
@@ -252,6 +323,11 @@ function doPost(e) {
   if (body.action === 'saveChecklist') {
     saveChecklistItems_(body.name || '', body.items || {});
     return jsonResponse_({ success: true });
+  }
+
+  if (body.action === 'incrementStats') {
+    const stats = incrementStats_(body.name || '', body.deltas || {});
+    return jsonResponse_({ success: true, stats: stats });
   }
 
   return jsonResponse_({ success: false, error: 'Unknown action: ' + body.action });

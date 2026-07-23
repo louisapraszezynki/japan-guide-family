@@ -22,7 +22,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;700&family=Zen+Maru+Gothic:wght@400;500;700&display=swap">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
-<link rel="stylesheet" href="style.css?v=67">
+<link rel="stylesheet" href="style.css?v=68">
 </head>
 <body>
 
@@ -48,6 +48,28 @@
       <input type="text" id="identityInput" placeholder="Votre prénom" required>
       <button type="submit">Valider</button>
     </form>
+  </div>
+</div>
+
+<div class="profile-modal" id="profileModal" hidden>
+  <div class="profile-modal-box">
+    <button type="button" class="profile-modal-close" id="profileModalClose" aria-label="Fermer">✕</button>
+    <div class="profile-modal-photo" id="profileModalPhoto"></div>
+    <h3 id="profileModalName"></h3>
+    <div class="profile-modal-stats">
+      <div class="profile-stat">
+        <span class="profile-stat-value" id="profileStatAdded">0</span>
+        <span class="profile-stat-label">Évènements ajoutés</span>
+      </div>
+      <div class="profile-stat">
+        <span class="profile-stat-value" id="profileStatDeleted">0</span>
+        <span class="profile-stat-label">Évènements supprimés</span>
+      </div>
+      <div class="profile-stat">
+        <span class="profile-stat-value" id="profileStatTime">0</span>
+        <span class="profile-stat-label">Temps passé sur le site</span>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -631,6 +653,6 @@
 </main>
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
-<script src="script.js?v=48"></script>
+<script src="script.js?v=49"></script>
 </body>
 </html>

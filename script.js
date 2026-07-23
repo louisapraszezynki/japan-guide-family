@@ -10,6 +10,7 @@ const FAMILY_FACES = {
   maman: { img: 'images/maman.png', label: 'Maman' },
   emmanuelle: { img: 'images/maman.png', label: 'Maman' },
   mathieu: { img: 'images/mathieu.png', label: 'Mathieu' },
+  lysandre: { img: 'images/lysandre.png', label: 'Lysandre' },
 };
 function normalizeName_(str){
   return (str || '').trim().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
@@ -79,6 +80,7 @@ let promptForIdentity = function(){};
 // ALLOWED_EMAILS secret to ever reach this page at all).
 const AUTH_EMAIL_TO_NAME = {
   'louisa.praszezynki@gmail.com': 'Louisa',
+  'hi@lysand.re': 'Lysandre',
 };
 
 function tryAuthIdentity(){

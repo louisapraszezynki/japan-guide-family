@@ -278,14 +278,19 @@ html.trip-started .section-num::before{content:attr(data-after);}
 }
 .hero-intro.dismissed{opacity:0; pointer-events:none;}
 .hero-intro-map{
-  position:static; flex:none;
+  position:relative; z-index:0; flex:none;
   width:min(90vw, 620px); height:min(90vh, 620px);
   background:var(--paper-alt); pointer-events:none;
 }
 .hero-intro-map .leaflet-container{background:var(--paper-alt); font-family:'Zen Maru Gothic', sans-serif;}
 .hero-intro-map .leaflet-control-attribution{font-size:.6rem;}
 .hero-intro-group{
-  position:absolute; left:53%; top:54%; width:0; height:0;
+  /* z-index here (not just position) is what matters: Leaflet's internal
+     panes have their own fairly high z-index values, so without this the
+     whole face-circle group — despite coming after .hero-intro-map in
+     the DOM — could still render behind the map's panes. An explicit
+     z-index makes this group its own stacking context above it. */
+  position:absolute; z-index:1; left:53%; top:54%; width:0; height:0;
   transition:transform .35s ease-out;
 }
 .hero-intro-face.image-placeholder{
